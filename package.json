@@ -1,0 +1,16 @@
+{
+  "name": "20240218-jmeyer24.github.io",
+  "version": "1.0.0",
+  "description": "A personal portfolio",
+  "main": "index.js",
+  "scripts": {
+    "dev": "vite --host",
+    "build": "vite build"
+  },
+  "author": "Jakob Meyer",
+  "license": "ISC",
+  "dependencies": {
+    "three": "^0.167.1",
+    "vite": "^5.3.5"
+  }
+}
