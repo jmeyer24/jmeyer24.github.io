@@ -1,7 +1,96 @@
-body {
-    margin: 0;
+:root {
+    --color-fg: white;
+    --color-bg: transparent;
+    --grid-width: 25vw;
+    --columns: 2;
+    --border-radius: 5%;
+    --grid-padding: 2vw;
+    --grid-gap: 2vw;
+    --font-size: calc(calc(var(--grid-width) - var(--grid-gap) * (var(--columns) - 1) / var(--columns)) / 25);
 }
 
-h1 {
-    background-color: green;
+body {
+    width: 50vw;
+    margin: 0;
+    color: var(--color-fg);
+    background-color: var(--color-bg);
+
+    /* make e.g. the grid gaps click through */
+    pointer-events: none;
+}
+
+canvas.webgl {
+    width: 100vw;
+    height: 100vh;
+    display: block;
+    position: fixed;
+    /* top: 0; */
+    /* left: 0; */
+    z-index: -9999;
+
+    /* make the link clickable */
+    pointer-events: auto;
+}
+
+div.projects {
+    width: var(--grid-width);
+
+    /* build grid layout */
+    display: grid;
+    grid-template-columns: repeat(var(--columns), 1fr);
+    grid-template-rows: repeat(autofill, 1fr);
+    grid-gap: var(--grid-gap);
+    padding: var(--grid-padding);
+}
+
+a.projectLink {
+    position: relative;
+    /* remove line height from the links <a> as there
+    is a default height to the links themselves */
+    line-height: 0;
+}
+
+img.projectImage {
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+    border-radius: var(--border-radius);
+    opacity: .75;
+
+    /* make the link clickable */
+    pointer-events: auto;
+}
+
+div.title {
+    /* setting the alpha to .5 her makes the text itself appear in full alpha when hovering */
+    background-color: rgb(0, 0, 0, .5);
+    color: white;
+    font-size: var(--font-size);
+    border-radius: var(--border-radius);
+
+    /* positioned relative to parent div (container) */
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    /* size */
+    width: 100%;
+    height: 100%;
+
+    /* center on image */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    /* reestablish line-height so text breaks work fine */
+    line-height: normal;
+
+    /* start invisible for hover effect */
+    opacity: 0;
+    transition: opacity 0.25s ease-in-out;
+}
+
+a.projectLink:hover div.title {
+    opacity: 1;
 }
