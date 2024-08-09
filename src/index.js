@@ -1,0 +1,1 @@
+$("#projects-button").on("click", function () { $("#projects")[0].classList.toggle("isOpen"); console.log($("#projects")[0].classList) });

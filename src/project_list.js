@@ -6,7 +6,7 @@ var projects = {
 
 function createImageLinks() {
     // fill the projects div with imaged links
-    var el = $(".projects");
+    var el = $("#projects");
     Object.entries(projects).forEach(([key, value]) => {
         el
             .append($("<a/>")
