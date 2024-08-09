@@ -15,8 +15,15 @@
 
 <body>
     <canvas class="webgl"></canvas>
-    <button type="button" id="projects-button" class="fa fa-folder"></button>
-    <div id="projects" class="isOpen"></div>
+    <div class="header">
+        <button type="button" class="toggle-button fa fa-align-left" id="projects-button"></button>
+        <h1 id="title">Portfolio of Projects</h1>
+        <button type="button" class="toggle-button fa fa-codepen" id="text-button"></button>
+    </div>
+    <div class="content">
+        <div class="isClosed" id="projects"></div>
+        <div class="isClosed" id="text"></div>
+    </div>
 </body>
 
 </html>

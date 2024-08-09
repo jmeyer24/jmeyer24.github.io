@@ -18,7 +18,7 @@ function createImageLinks() {
                     .attr("alt", value)
                 )
                 .append($("<div/>")
-                    .addClass("title")
+                    .addClass("imageTitle")
                     .append(value)
                 )
             )
