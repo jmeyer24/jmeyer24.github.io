@@ -12,21 +12,24 @@ function createImageLinks() {
             .append($("<li/>")
                 .append($("<a/>")
                     .addClass("project-link")
-                    .attr("href", `https://jmeyer24.github.io/${key}`)
+                    // .attr("href", `https://jmeyer24.github.io/${key}`)
+                    .attr("href", "")
                     .append($("<img/>")
                         .addClass("project-image")
                         .attr("src", `/image_${key}.jpg`)
                         .attr("alt", value)
                     )
-                    // .append($("<div/>")
-                    //     .addClass("project-image-title")
-                    //     .append(value)
-                    // )
+                    .append($("<div/>")
+                        .addClass("project-image-title")
+                        .append(value)
+                    )
                 )
             )
     })
 }
 
+$(function () { createImageLinks() });
+$(function () { createImageLinks() });
 $(function () { createImageLinks() });
 $(function () { createImageLinks() });
 $(function () { createImageLinks() });

@@ -15,17 +15,19 @@
 
 <body>
     <canvas class="webgl"></canvas>
-    <div class="header">
-        <button type="button" class="toggle-button fa fa-align-left" id="project-list-button"></button>
-        <h1 id="title">Portfolio of Projects</h1>
-        <button type="button" class="toggle-button fa fa-codepen" id="text-button"></button>
-    </div>
-    <div class="content">
+    <div class="sidebar">
         <div class="scroll-wrapper" id="project-list-wrapper">
             <ul id="project-list"></ul>
         </div>
+    </div>
+    <div class="content">
+        <div class="header">
+            <button type="button" class="toggle-button fa fa-align-left" id="sidebar-button"></button>
+            <h1 id="title">Portfolio of Projects</h1>
+            <button type="button" class="toggle-button fa fa-codepen" id="text-button"></button>
+        </div>
         <div class="scroll-wrapper" id="text-wrapper">
-            <div class="isClosed" id="text"></div>
+            <div id="text"></div>
         </div>
     </div>
 </body>

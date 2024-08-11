@@ -6,23 +6,25 @@
 /* how is it animated or transformed on some action */
 
 :root {
-    --header-height: calc(var(--button-size) + var(--body-padding) * 2);
     --body-padding: 2vw;
+    --button-padding: 8vw;
+    --header-height:
 
-    --columns: 4;
-    --project-list-width: 30vw;
-    --project-list-viewport-width: 20vw;
-    --grid-gap: 0vw;
+        --columns: 4;
+    --project-list-width: 25vw;
+    --project-list-viewport-width: 15vw;
+    --hiding-distance: calc(100% + var(--body-padding));
 
     --button-size: 5vw;
-    --thumb-size: 30px;
+    --thumb-size: 2vw;
     --border-radius: 1em;
-    --font-size: calc(calc(var(--project-list-width) - var(--grid-gap) * (var(--columns) - 1) / var(--columns)) / 25);
+    /* TODO: calculate */
+    --font-size: 1.5em;
+
     --color-bg: transparent;
     --color-fg: lightgrey;
     --color-high: rgb(195, 255, 155);
 
-    --hiding-distance: calc(100% + var(--body-padding));
     --min-brightness: 0.25;
 }
 
@@ -32,13 +34,52 @@
     }
 }
 
+* {
+    /* animate button toggle */
+    transition: 1s;
+}
+
 body {
-    margin: var(--body-padding) 0;
-    overflow: hidden;
+    margin: 0;
+    /* overflow: hidden; */
     box-sizing: border-box;
 
     color: var(--color-fg);
     background-color: var(--color-bg);
+}
+
+
+/* =============== */
+/* sidebar section */
+/* =============== */
+.sidebar {
+    height: 100vh;
+    overflow-y: scroll;
+
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1;
+}
+
+.sidebar.is-closed {
+    transform: translateX(calc(var(--hiding-distance) * -1));
+}
+
+
+/* =============== */
+/* content section */
+/* =============== */
+.content {
+    width: calc(100% - var(--project-list-viewport-width));
+
+    position: relative;
+    left: var(--project-list-viewport-width);
+}
+
+.is-wide {
+    width: 100%;
+    left: 0;
 }
 
 
@@ -48,9 +89,12 @@ body {
 .header {
     margin: var(--body-padding);
 
+    position: sticky;
+    top: var(--body-padding);
+    z-index: 1;
+
     display: grid;
     grid-template-columns: min-content 1fr min-content;
-    justify-content: center;
 }
 
 #title {
@@ -68,6 +112,7 @@ body {
     /* how big (width, margin, overflow, ...) */
     width: var(--button-size);
     height: var(--button-size);
+    margin: 0 var(--button-padding);
 
     /* where (position, z-index, ...) */
 
@@ -85,121 +130,81 @@ body {
     background-color: var(--color-high);
 }
 
-#project-list-button {
-    left: 0;
-}
-
-#text-button {
-    right: 0;
-}
-
-
-/* =============== */
-/* content section */
-/* =============== */
-.content {
-    height: calc(100vh - var(--header-height) - var(--body-padding));
-    margin: var(--body-padding) 0;
-
-    /* build grid layout */
-    display: grid;
-    grid-template-columns: min-content 1fr;
-    grid-gap: var(--body-padding);
-}
-
 
 /* ================ */
-/* projects section */
+/* wrapper section */
 /* ================ */
 .scroll-wrapper {
     overflow-y: auto;
-    box-sizing: content-box;
-    /* padding: 0 1vw 0 0; */
-
-    /* animate toggle */
-    transition: 1s;
+    padding: 0 1vw 0 0;
 }
 
-.scroll-wrapper>* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
+#text-wrapper {
+    margin: var(--body-padding);
 }
 
-#project-list-wrapper {
-    transform: translate(-3vw);
+#text-wrapper.is-closed {
+    transform: translateX(var(--hiding-distance));
 }
 
+
+/* ==================== */
+/* project list section */
+/* ==================== */
 #project-list {
     width: var(--project-list-width);
+    margin: 0;
     padding: 0;
 
-    /* build grid layout */
-    /* display: grid;
-    grid-template-columns: repeat(var(--columns), 1fr);
-    grid-template-rows: repeat(var(--columns), min-content);
-    grid-gap: var(--grid-gap); */
     /* build flex layout */
     display: flex;
     flex-direction: column;
 
     /* looks of list */
     list-style-type: none;
-
-    /* animate */
-    transition: 1s;
-
-    /* 3d perspective css */
-    /* transform-style: preserve-3d; */
-    /* transform: perspective(var(--viewport-z-translation)); */
-    /* needed for 3d perspective */
-    /* overflow: visible !important; */
 }
 
 li {
-    /* padding: 0 10%; */
-
-    transition: 1s;
+    transition: 1s ease-out;
     filter: brightness(var(--min-brightness));
-}
-
-li:hover {
-    filter: brightness(1);
-    z-index: 1;
 }
 
 li:not(:hover) {
     transform: translateX(-10vw);
 }
 
+li:hover {
+    filter: brightness(1);
+}
+
 li:hover+* {
     filter: brightness(calc((1 - var(--min-brightness)) * 0.5 + var(--min-brightness)));
-    transform: translateX(-2.5vw);
+    transform: translateX(-5vw);
 }
 
 li:hover+*+* {
     filter: brightness(calc((1 - var(--min-brightness)) * 0.25 + var(--min-brightness)));
-    transform: translateX(-5vw);
+    transform: translateX(-7.5vw);
 }
 
 li:hover+*+*+* {
     filter: brightness(calc((1 - var(--min-brightness)) * 0.1 + var(--min-brightness)));
-    transform: translateX(-7.5vw);
+    transform: translateX(-8.5vw);
 }
 
 li:has(+*:hover) {
     filter: brightness(calc((1 - var(--min-brightness)) * 0.5 + var(--min-brightness)));
-    transform: translateX(-2.5vw);
+    transform: translateX(-5vw);
 }
 
 li:has(+*+*:hover) {
     filter: brightness(calc((1 - var(--min-brightness)) * 0.25 + var(--min-brightness)));
-    transform: translateX(-5vw);
+    transform: translateX(-7.5vw);
 }
 
 li:has(+*+*+*:hover) {
     filter: brightness(calc((1 - var(--min-brightness)) * 0.1 + var(--min-brightness)));
-    transform: translateX(-7.5vw);
+    transform: translateX(-8.5vw);
 }
 
 .project-link {
@@ -242,7 +247,7 @@ li:has(+*+*+*:hover) {
     line-height: normal;
 
     /* setting the alpha to .5 her makes the text itself appear in full alpha when hovering */
-    background-color: rgb(0, 0, 0, .5);
+    /* background-color: rgb(0, 0, 0, 0); */
     color: white;
     font-size: var(--font-size);
     border-radius: var(--border-radius);
@@ -258,33 +263,11 @@ li:has(+*+*+*:hover) {
 /* text section */
 /* ============ */
 #text {
+    height: calc(100vh - var(--button-size) - var(--body-padding) * 3);
+
     display: flex;
     flex-direction: column;
     text-align: center;
-}
-
-#project-list-wrapper.isClosed {
-    transform: translateX(calc(var(--hiding-distance) * -1));
-}
-
-#text-wrapper.isClosed {
-    transform: translateX(var(--hiding-distance));
-}
-
-
-
-
-/* ====== */
-/* canvas */
-/* ====== */
-.webgl {
-    width: 100vw;
-    height: 100vh;
-
-    position: fixed;
-    top: 0;
-    left: 0;
-    z-index: -9999;
 }
 
 
@@ -299,12 +282,7 @@ li:has(+*+*+*:hover) {
 /* width */
 .scroll-wrapper::-webkit-scrollbar {
     display: block;
-    width: 30px;
-}
-
-.scroll-wrapper#project-list-wrapper::-webkit-scrollbar {
-    display: none;
-    width: 30px;
+    width: 20px;
 }
 
 /* Track */
@@ -326,4 +304,18 @@ li:has(+*+*+*:hover) {
     background: radial-gradient(circle, var(--color-high) 0%, var(--color-high) 45%, transparent 50%, transparent 100%) no-repeat;
     background-size: var(--thumb-size) var(--thumb-size);
     background-position: center;
+}
+
+
+/* ====== */
+/* canvas */
+/* ====== */
+.webgl {
+    width: 100vw;
+    height: 100vh;
+
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: -9999;
 }

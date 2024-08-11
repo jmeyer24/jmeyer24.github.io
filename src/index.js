@@ -1,8 +1,9 @@
 // toggle sidebar when button is pressed 
-$("#project-list-button")
+$("#sidebar-button")
     .on("click",
         function () {
-            $("#project-list-wrapper")[0].classList.toggle("isClosed");
+            $(".sidebar")[0].classList.toggle("is-closed");
+            $(".content")[0].classList.toggle("is-wide");
             // console.log($("#project-list")[0].classList)
         });
 
@@ -10,7 +11,7 @@ $("#project-list-button")
 $("#text-button")
     .on("click",
         function () {
-            $("#text-wrapper")[0].classList.toggle("isClosed");
+            $("#text-wrapper")[0].classList.toggle("is-closed");
             // console.log($("#project-list")[0].classList)
         });
 
@@ -22,7 +23,7 @@ $(document.documentElement)
             switch (e.which) {
                 case 9: // tab key
                     e.preventDefault();
-                    $("#project-list-button").trigger("click");
+                    $("#sidebar-button").trigger("click");
                     break;
                 case 84: // "t" key
                     $("#text-button").trigger("click");
