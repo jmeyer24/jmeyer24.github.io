@@ -1,20 +1,29 @@
+/* this is the structure in each block */
+/* how big (width, margin, overflow, ...) */
+/* where (position, z-index, ...) */
+/* how is it displayed (grid, ...) */
+/* how does it look (color, ...) */
+/* how is it animated or transformed on some action */
+
 :root {
     --header-height: calc(var(--button-size) + var(--body-padding) * 2);
     --body-padding: 2vw;
 
-    --columns: 2;
-    --grid-width: 30vw;
-    --grid-gap: 2vw;
+    --columns: 4;
+    --project-list-width: 30vw;
+    --project-list-viewport-width: 20vw;
+    --grid-gap: 0vw;
 
     --button-size: 5vw;
     --thumb-size: 30px;
-    --border-radius: 5%;
-    --font-size: calc(calc(var(--grid-width) - var(--grid-gap) * (var(--columns) - 1) / var(--columns)) / 25);
+    --border-radius: 1em;
+    --font-size: calc(calc(var(--project-list-width) - var(--grid-gap) * (var(--columns) - 1) / var(--columns)) / 25);
     --color-bg: transparent;
     --color-fg: lightgrey;
     --color-high: rgb(195, 255, 155);
 
     --hiding-distance: calc(100% + var(--body-padding));
+    --min-brightness: 0.25;
 }
 
 @media only screen and (max-width: 1000px) {
@@ -24,12 +33,12 @@
 }
 
 body {
-    margin: var(--body-padding);
+    margin: var(--body-padding) 0;
+    overflow: hidden;
+    box-sizing: border-box;
 
     color: var(--color-fg);
     background-color: var(--color-bg);
-
-    overflow: hidden;
 }
 
 
@@ -37,7 +46,7 @@ body {
 /* header section */
 /* ============== */
 .header {
-    margin: var(--body-padding) 0;
+    margin: var(--body-padding);
 
     display: grid;
     grid-template-columns: min-content 1fr min-content;
@@ -63,19 +72,20 @@ body {
     /* where (position, z-index, ...) */
 
     /* how is it displayed (grid, ...) */
-    /* nothing here */
 
     /* how does it look (color, ...) */
     background-color: var(--color-fg);
     border: none;
     border-radius: 100%;
+
+    /* how is it animated or transformed on some action */
 }
 
 .toggle-button:hover {
     background-color: var(--color-high);
 }
 
-#projects-button {
+#project-list-button {
     left: 0;
 }
 
@@ -97,70 +107,131 @@ body {
     grid-gap: var(--body-padding);
 }
 
-#projects {
-    width: var(--grid-width);
-    padding: 0 1vw 0 0;
+
+/* ================ */
+/* projects section */
+/* ================ */
+.scroll-wrapper {
     overflow-y: auto;
+    box-sizing: content-box;
+    /* padding: 0 1vw 0 0; */
+
+    /* animate toggle */
+    transition: 1s;
+}
+
+.scroll-wrapper>* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+#project-list-wrapper {
+    transform: translate(-3vw);
+}
+
+#project-list {
+    width: var(--project-list-width);
+    padding: 0;
 
     /* build grid layout */
-    display: grid;
+    /* display: grid;
     grid-template-columns: repeat(var(--columns), 1fr);
-    grid-gap: var(--grid-gap);
+    grid-template-rows: repeat(var(--columns), min-content);
+    grid-gap: var(--grid-gap); */
+    /* build flex layout */
+    display: flex;
+    flex-direction: column;
 
-    /* animate toggle */
-    transition: 0.5s;
+    /* looks of list */
+    list-style-type: none;
+
+    /* animate */
+    transition: 1s;
+
+    /* 3d perspective css */
+    /* transform-style: preserve-3d; */
+    /* transform: perspective(var(--viewport-z-translation)); */
+    /* needed for 3d perspective */
+    /* overflow: visible !important; */
 }
 
-#text {
-    width: calc(100vw - var(--grid-width) - var(--body-padding) * 4);
-    height: calc(100vh - var(--header-height) - var(--body-padding));
-    overflow-y: auto;
+li {
+    /* padding: 0 10%; */
 
-    padding: 0 1vw 0 0;
-
-    display: grid;
-    text-align: center;
-
-    /* animate toggle */
-    transition: 0.5s;
+    transition: 1s;
+    filter: brightness(var(--min-brightness));
 }
 
-#projects.isClosed {
-    transform: translateX(calc(var(--hiding-distance) * -1));
+li:hover {
+    filter: brightness(1);
+    z-index: 1;
 }
 
-#text.isClosed {
-    transform: translateX(var(--hiding-distance));
+li:not(:hover) {
+    transform: translateX(-10vw);
 }
 
+li:hover+* {
+    filter: brightness(calc((1 - var(--min-brightness)) * 0.5 + var(--min-brightness)));
+    transform: translateX(-2.5vw);
+}
 
-/* ========== */
-/* image link */
-/* ========== */
-.projectImage {
+li:hover+*+* {
+    filter: brightness(calc((1 - var(--min-brightness)) * 0.25 + var(--min-brightness)));
+    transform: translateX(-5vw);
+}
+
+li:hover+*+*+* {
+    filter: brightness(calc((1 - var(--min-brightness)) * 0.1 + var(--min-brightness)));
+    transform: translateX(-7.5vw);
+}
+
+li:has(+*:hover) {
+    filter: brightness(calc((1 - var(--min-brightness)) * 0.5 + var(--min-brightness)));
+    transform: translateX(-2.5vw);
+}
+
+li:has(+*+*:hover) {
+    filter: brightness(calc((1 - var(--min-brightness)) * 0.25 + var(--min-brightness)));
+    transform: translateX(-5vw);
+}
+
+li:has(+*+*+*:hover) {
+    filter: brightness(calc((1 - var(--min-brightness)) * 0.1 + var(--min-brightness)));
+    transform: translateX(-7.5vw);
+}
+
+.project-link {
     width: 100%;
-    aspect-ratio: 1;
+    position: relative;
+    display: inherit;
+
+    /* remove line height from the links <a> as there is a default height to the links themselves */
+    line-height: 0;
+}
+
+.project-link:hover .project-image-title {
+    opacity: 1;
+}
+
+.project-image {
+    width: 100%;
+    aspect-ratio: 3;
     object-fit: cover;
     border-radius: var(--border-radius);
-    opacity: .75;
 }
 
-.imageTitle {
-    /* setting the alpha to .5 her makes the text itself appear in full alpha when hovering */
-    background-color: rgb(0, 0, 0, .5);
-    color: white;
-    font-size: var(--font-size);
-    border-radius: var(--border-radius);
+.project-image-title {
+    /* size */
+    width: 100%;
+    height: 100%;
 
-    /* positioned relative to parent div (container) */
+    /* positioned absolute to parent div (container) */
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-
-    /* size */
-    width: 100%;
-    height: 100%;
 
     /* center on image */
     display: flex;
@@ -170,21 +241,37 @@ body {
     /* reestablish line-height so text breaks work fine */
     line-height: normal;
 
+    /* setting the alpha to .5 her makes the text itself appear in full alpha when hovering */
+    background-color: rgb(0, 0, 0, .5);
+    color: white;
+    font-size: var(--font-size);
+    border-radius: var(--border-radius);
     /* start invisible for hover effect */
     opacity: 0;
+
+    /* hover effect reveal */
     transition: opacity 0.25s ease-in-out;
 }
 
-.projectLink {
-    position: relative;
-    /* remove line height from the links <a> as there
-    is a default height to the links themselves */
-    line-height: 0;
+
+/* ============ */
+/* text section */
+/* ============ */
+#text {
+    display: flex;
+    flex-direction: column;
+    text-align: center;
 }
 
-.projectLink:hover .imageTitle {
-    opacity: 1;
+#project-list-wrapper.isClosed {
+    transform: translateX(calc(var(--hiding-distance) * -1));
 }
+
+#text-wrapper.isClosed {
+    transform: translateX(var(--hiding-distance));
+}
+
+
 
 
 /* ====== */
@@ -210,9 +297,13 @@ body {
 }
 
 /* width */
-#text::-webkit-scrollbar,
-#projects::-webkit-scrollbar {
+.scroll-wrapper::-webkit-scrollbar {
     display: block;
+    width: 30px;
+}
+
+.scroll-wrapper#project-list-wrapper::-webkit-scrollbar {
+    display: none;
     width: 30px;
 }
 

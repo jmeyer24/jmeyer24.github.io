@@ -6,20 +6,22 @@ var projects = {
 
 function createImageLinks() {
     // fill the projects div with imaged links
-    var el = $("#projects");
+    var el = $("#project-list");
     Object.entries(projects).forEach(([key, value]) => {
         el
-            .append($("<a/>")
-                .addClass("projectLink")
-                .attr("href", `https://jmeyer24.github.io/${key}`)
-                .append($("<img/>")
-                    .addClass("projectImage")
-                    .attr("src", `/image_${key}.jpg`)
-                    .attr("alt", value)
-                )
-                .append($("<div/>")
-                    .addClass("imageTitle")
-                    .append(value)
+            .append($("<li/>")
+                .append($("<a/>")
+                    .addClass("project-link")
+                    .attr("href", `https://jmeyer24.github.io/${key}`)
+                    .append($("<img/>")
+                        .addClass("project-image")
+                        .attr("src", `/image_${key}.jpg`)
+                        .attr("alt", value)
+                    )
+                    // .append($("<div/>")
+                    //     .addClass("project-image-title")
+                    //     .append(value)
+                    // )
                 )
             )
     })

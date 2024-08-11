@@ -1,17 +1,17 @@
 // toggle sidebar when button is pressed 
-$("#projects-button")
+$("#project-list-button")
     .on("click",
         function () {
-            $("#projects")[0].classList.toggle("isClosed");
-            // console.log($("#projects")[0].classList)
+            $("#project-list-wrapper")[0].classList.toggle("isClosed");
+            // console.log($("#project-list")[0].classList)
         });
 
 // toggle text when button is pressed 
 $("#text-button")
     .on("click",
         function () {
-            $("#text")[0].classList.toggle("isClosed");
-            // console.log($("#projects")[0].classList)
+            $("#text-wrapper")[0].classList.toggle("isClosed");
+            // console.log($("#project-list")[0].classList)
         });
 
 // trigger a button when a respective key is pressed
@@ -22,7 +22,7 @@ $(document.documentElement)
             switch (e.which) {
                 case 9: // tab key
                     e.preventDefault();
-                    $("#projects-button").trigger("click");
+                    $("#project-list-button").trigger("click");
                     break;
                 case 84: // "t" key
                     $("#text-button").trigger("click");
