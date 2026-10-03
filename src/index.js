@@ -18,11 +18,11 @@ $("#text-button")
 // trigger a button when a respective key is pressed
 $(document.documentElement)
     .on("keydown",
-        function (e) {
-            // console.log(e.keyCode);
-            switch (e.which) {
+        function (event) {
+            // console.log(event.keyCode);
+            switch (event.which) {
                 case 9: // tab key
-                    e.preventDefault();
+                    event.preventDefault();
                     $("#sidebar-button").trigger("click");
                     break;
                 case 84: // "t" key

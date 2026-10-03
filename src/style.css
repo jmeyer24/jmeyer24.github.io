@@ -22,7 +22,8 @@
     --font-size: 1.5em;
 
     --color-bg: transparent;
-    --color-fg: lightgrey;
+    --color-fg: green;
+        /* --color-fg: lightgrey; */
     --color-high: rgb(195, 255, 155);
 
     --min-brightness: 0.25;
