@@ -56,7 +56,7 @@ window.addEventListener("mousemove", (event) => {
 const loader = new GLTFLoader();
 loader.load(
     // resource URL
-    "public/Electric_Towers.gltf",
+    "Electric_Towers.gltf",
     // called when the resource is loaded
     function (gltf) {
         // add the whole scene (10 objects here)
