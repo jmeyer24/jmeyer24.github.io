@@ -22,7 +22,7 @@
     --font-size: 1.5em;
 
     --color-bg: transparent;
-    --color-fg: green;
+    --color-fg: rgb(32, 53, 32);
         /* --color-fg: lightgrey; */
     --color-high: rgb(195, 255, 155);
 
