@@ -7,9 +7,11 @@
     "dev": "vite --host",
     "build": "vite build"
   },
-  "author": "Jakob Meyer",
+  "author": "Jakob B. Meyer",
   "license": "ISC",
   "dependencies": {
+    "@tailwindcss/vite": "^4.3.3",
+    "tailwindcss": "^4.3.3",
     "three": "^0.186.1",
     "vite": "^8.3.2"
   }
