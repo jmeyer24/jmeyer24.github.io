@@ -4,7 +4,7 @@ var projects = {
     "MalazanKnowledgeGraph": "Malazan Graph"
 };
 
-function createImageLinks() {
+export function createImageLinks() {
     // fill the projects div with imaged links
     var element = $("#project-list");
     Object.entries(projects).forEach(([key, value]) => {
@@ -27,10 +27,3 @@ function createImageLinks() {
             )
     })
 }
-
-$(function () { createImageLinks() });
-$(function () { createImageLinks() });
-$(function () { createImageLinks() });
-$(function () { createImageLinks() });
-$(function () { createImageLinks() });
-$(function () { createImageLinks() });

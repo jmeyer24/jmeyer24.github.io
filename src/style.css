@@ -1,3 +1,5 @@
+@import "tailwindcss";
+
 /* this is the structure in each block */
 /* how big (width, margin, overflow, ...) */
 /* where (position, z-index, ...) */
@@ -7,21 +9,21 @@
 
 :root {
   --body-padding: 2vw;
-  --button-padding: 8vw;
+  --button-padding: 0.5vw;
   --header-height: --columns: 4;
   --project-list-width: 25vw;
   --project-list-viewport-width: 15vw;
   --hiding-distance: calc(100% + var(--body-padding));
 
-  --button-size: 5vw;
-  --thumb-size: 2vw;
+  --button-size: 3vw;
   --border-radius: 1em;
-  /* TODO: calculate */
-  --font-size: 1.5em;
 
-  --color-bg: #dfdfff; /* --color-bg: transparent; */
-  --color-fg: #020498; /* birthday 0x020498 */
+  /* can we use the  @variant dark here for some own color schemes? */
+  --color-bg: #0a0a0a; /* --color-bg: transparent; */
+  --color-accent: #020498; /* birthday 0x020498 */
   --color-high: #1155fa; /* from 2/30 days, 4/12 months and 98/100 century years times 255 each */
+  --color-text: #dfdfff; /* --color-bg: transparent; */
+  --muting-factor: 50%;
 
   --min-brightness: 0.45;
 
@@ -35,29 +37,65 @@
 }
 
 * {
-  /* animate button toggle */
+  /* time to animate e.g. hover effects */
   transition: var(--transition-time);
 }
 
 body {
-  margin: 0;
-  /* overflow: hidden; */
-  box-sizing: border-box;
-
-  color: var(--color-fg);
+  color: var(--color-text);
   background-color: var(--color-bg);
+}
+
+.highlight {
+  color: var(--color-high);
+}
+
+.accent {
+  color: var(--color-accent);
+}
+
+.divider-t {
+  border-top: 0.5px solid var(--color-high);
+}
+
+.divider-b {
+  border-bottom: 0.5px solid var(--color-high);
+}
+
+.divider-l {
+  border-left: 0.5px solid var(--color-high);
+}
+
+.divider-r {
+  border-right: 0.5px solid var(--color-high);
+}
+
+.gradient-t {
+  @apply rounded-xl bg-linear-to-t from-(--color-bg) from-50% to-(--color-high)/50;
+}
+
+.gradient-b {
+  @apply rounded-xl bg-linear-to-b from-(--color-bg) from-50% to-(--color-high)/50;
+}
+
+.gradient-l {
+  @apply rounded-3xl bg-linear-to-l from-(--color-bg) from-50% to-(--color-high)/50;
+}
+
+.gradient-r {
+  @apply rounded-3xl bg-linear-to-r from-(--color-bg) from-50% to-(--color-high)/50;
 }
 
 /* =============== */
 /* sidebar section */
 /* =============== */
 .sidebar {
-  height: 100vh;
+  height: 91vh;
   overflow-y: scroll;
 
   position: fixed;
-  top: 0;
-  left: 0;
+  top: 8vh;
+  left: calc(-0.5 * var(--body-padding));
   z-index: 1;
 }
 
@@ -75,37 +113,30 @@ body {
   left: var(--project-list-viewport-width);
 }
 
-.is-wide {
+.content.is-wide {
   width: 100%;
   left: 0;
 }
 
-/* ============== */
-/* header section */
-/* ============== */
-.header {
-  margin: var(--body-padding);
-
-  position: sticky;
-  top: var(--body-padding);
-  z-index: 1;
-
-  display: grid;
-  grid-template-columns: min-content 1fr min-content;
+.link-text {
+  @apply underline hover:text-(--color-high) transition-colors;
 }
 
-#title {
-  margin: 0;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-
-  text-decoration: underline;
+/* ============== */
+/* navigation bar */
+/* ============== */
+.link-nav {
+  /* color: var(--color-high); */
+  border-radius: calc(var(--border-radius) - 2px);
+  padding-inline: calc(var(--spacing) * 3);
+  padding-block: calc(var(--spacing) * 3);
 }
 
-.toggle-button {
+.link-nav:hover {
+  background-color: var(--color-high);
+}
+
+.button-nav {
   /* how big (width, margin, overflow, ...) */
   width: var(--button-size);
   height: var(--button-size);
@@ -116,31 +147,16 @@ body {
   /* how is it displayed (grid, ...) */
 
   /* how does it look (color, ...) */
-  background-color: var(--color-fg);
-  border: none;
+  color: var(--color-text);
+  background-color: transparent;
+  border: 1px solid var(--color-high);
   border-radius: 100%;
 
   /* how is it animated or transformed on some action */
 }
 
-.toggle-button:hover {
+.button-nav:hover {
   background-color: var(--color-high);
-}
-
-/* ================ */
-/* wrapper section */
-/* ================ */
-.scroll-wrapper {
-  overflow-y: auto;
-  padding: 0 1vw 0 0;
-}
-
-#text-wrapper {
-  margin: var(--body-padding);
-}
-
-#text-wrapper.is-closed {
-  transform: translateX(var(--hiding-distance));
 }
 
 /* ==================== */
@@ -148,7 +164,7 @@ body {
 /* ==================== */
 #project-list {
   width: var(--project-list-width);
-  margin: 0;
+  margin-top: 0;
   padding: 0;
 
   /* build flex layout */
@@ -159,55 +175,55 @@ body {
   list-style-type: none;
 }
 
-li {
+#project-list > li {
   transition: var(--transition-time) ease-out;
   filter: brightness(var(--min-brightness));
 }
 
-li:not(:hover) {
+#project-list > li:not(:hover) {
   transform: translateX(-10vw);
 }
 
-li:hover {
+#project-list > li:hover {
   filter: brightness(1);
 }
 
-li:hover + * {
+#project-list > li:hover + * {
   filter: brightness(
     calc((1 - var(--min-brightness)) * 0.5 + var(--min-brightness))
   );
   transform: translateX(-5vw);
 }
 
-li:hover + * + * {
+#project-list > li:hover + * + * {
   filter: brightness(
     calc((1 - var(--min-brightness)) * 0.25 + var(--min-brightness))
   );
   transform: translateX(-7.5vw);
 }
 
-li:hover + * + * + * {
+#project-list > li:hover + * + * + * {
   filter: brightness(
     calc((1 - var(--min-brightness)) * 0.1 + var(--min-brightness))
   );
   transform: translateX(-8.5vw);
 }
 
-li:has(+ *:hover) {
+#project-list > li:has(+ *:hover) {
   filter: brightness(
     calc((1 - var(--min-brightness)) * 0.5 + var(--min-brightness))
   );
   transform: translateX(-5vw);
 }
 
-li:has(+ * + *:hover) {
+#project-list > li:has(+ * + *:hover) {
   filter: brightness(
     calc((1 - var(--min-brightness)) * 0.25 + var(--min-brightness))
   );
   transform: translateX(-7.5vw);
 }
 
-li:has(+ * + * + *:hover) {
+#project-list > li:has(+ * + * + *:hover) {
   filter: brightness(
     calc((1 - var(--min-brightness)) * 0.1 + var(--min-brightness))
   );
@@ -215,12 +231,17 @@ li:has(+ * + * + *:hover) {
 }
 
 .project-link {
+  margin-top: 10px;
   width: 100%;
   position: relative;
   display: inherit;
 
   /* remove line height from the links <a> as there is a default height to the links themselves */
   line-height: 0;
+}
+
+#project-list > li:first-child > .project-link {
+  margin-top: 0px;
 }
 
 .project-link:hover .project-image-title {
@@ -254,8 +275,10 @@ li:has(+ * + * + *:hover) {
   line-height: normal;
 
   /* setting the alpha to .5 her makes the text itself appear in full alpha when hovering */
-  /* background-color: rgb(0, 0, 0, 0); */
   color: white;
+  text-shadow:
+    -1px 1px 2px var(--color-high),
+    1px 1px 1px var(--color-bg);
   font-size: var(--font-size);
   border-radius: var(--border-radius);
   /* start invisible for hover effect */
@@ -263,17 +286,6 @@ li:has(+ * + * + *:hover) {
 
   /* hover effect reveal */
   transition: opacity var(--transition-time) ease-in-out;
-}
-
-/* ============ */
-/* text section */
-/* ============ */
-#text {
-  height: calc(100vh - var(--button-size) - var(--body-padding) * 3);
-
-  display: flex;
-  flex-direction: column;
-  text-align: center;
 }
 
 /* ========= */
@@ -284,49 +296,9 @@ li:has(+ * + * + *:hover) {
   display: none;
 }
 
-/* width */
-.scroll-wrapper::-webkit-scrollbar {
-  display: block;
-  width: 20px;
-}
-
-/* Track */
-::-webkit-scrollbar-track {
-  background: radial-gradient(
-      circle,
-      var(--color-fg) 0%,
-      var(--color-fg) 80%,
-      transparent 100%
-    )
-    no-repeat;
-  background-size: 3px;
-  background-position: center;
-}
-
-/* Handle */
-::-webkit-scrollbar-thumb {
-  background: radial-gradient(
-      circle,
-      var(--color-fg) 0%,
-      var(--color-fg) 45%,
-      transparent 50%,
-      transparent 100%
-    )
-    no-repeat;
-  background-size: var(--thumb-size) var(--thumb-size);
-  background-position: center;
-}
-
-/* Handle on hover */
-::-webkit-scrollbar-thumb:hover {
-  background: radial-gradient(
-      circle,
-      var(--color-high) 0%,
-      var(--color-high) 45%,
-      transparent 50%,
-      transparent 100%
-    )
-    no-repeat;
-  background-size: var(--thumb-size) var(--thumb-size);
-  background-position: center;
+/* ====== */
+/* footer */
+/* ====== */
+.link-social {
+  @apply text-(--color-text)/(--muting-factor) hover:text-(--color-high) transition-colors;
 }
