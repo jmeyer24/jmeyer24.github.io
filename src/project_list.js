@@ -16,7 +16,7 @@ export function createImageLinks() {
                     .attr("href", "")
                     .append($("<img/>")
                         .addClass("project-image")
-                        .attr("src", `/image_${key}.jpg`)
+                        .attr("src", `/images/${key}.jpg`)
                         .attr("alt", value)
                     )
                     .append($("<div/>")

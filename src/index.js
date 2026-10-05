@@ -24,13 +24,13 @@ $(document.documentElement).on("keydown", function (event) {
 });
 
 // create the navigation bar and the footer bar
-await fetch("src/pages/nav.html")
+await fetch("/pages/nav.html")
     .then(response => response.text())
     .then((data) => {
         $("nav").html(data)
     });
 
-await fetch("src/pages/footer.html")
+await fetch("/pages/footer.html")
     .then(response => response.text())
     .then((data) => {
         $("footer").html(data)
@@ -39,7 +39,7 @@ await fetch("src/pages/footer.html")
 // write a text on the welcome page
 let current_site = window.location.pathname.split('/').filter(Boolean)[0]
 current_site = current_site ? current_site : "welcome";
-fetch(`src/pages/${current_site}.html`)
+fetch(`/pages/${current_site}.html`)
     .then(response => response.text())
     .then((data) => {
         $("main").html(data)
