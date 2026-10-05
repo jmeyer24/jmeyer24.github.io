@@ -300,5 +300,9 @@ body {
 /* footer */
 /* ====== */
 .link-social {
-  @apply text-(--color-text)/(--muting-factor) hover:text-(--color-high) transition-colors;
+  @apply hover:text-(--color-high) transition-colors;
+}
+
+.mute {
+  @apply text-(--color-text)/(--muting-factor)
 }
