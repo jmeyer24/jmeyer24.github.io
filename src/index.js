@@ -30,26 +30,25 @@ await fetch("/pages/nav.html")
         $("nav").html(data)
     });
 
-await fetch("/pages/footer.html")
-    .then(response => response.text())
-    .then((data) => {
-        $("footer").html(data)
-    });
+$("footer").load("/pages/footer.html")
 
-// write a text on the welcome page
+// write the content in the main element
 let current_site = window.location.pathname.split('/').filter(Boolean)[0]
 current_site = current_site ? current_site : "welcome";
-fetch(`/pages/${current_site}.html`)
-    .then(response => response.text())
-    .then((data) => {
-        $("main").html(data)
-    });
-$("#current-site").html(current_site);
 
-// create the sidebar image links
-$(function () { createImageLinks() });
-$(function () { createImageLinks() });
-$(function () { createImageLinks() });
-$(function () { createImageLinks() });
-$(function () { createImageLinks() });
-$(function () { createImageLinks() });
+$("main").load(`/pages/${current_site}.html`, function (response, status, xhr) {
+    if (status == "error") {
+        console.warn(`Seite ${current_site}.html konnte nicht geladen werden. HTTP-Status: ${xhr.status}`);
+        $("main").load("/pages/404.html");
+    }
+});
+
+$("nav #current-site").html(current_site);
+
+// // create the sidebar image links
+// $(function () { createImageLinks() });
+// $(function () { createImageLinks() });
+// $(function () { createImageLinks() });
+// $(function () { createImageLinks() });
+// $(function () { createImageLinks() });
+// $(function () { createImageLinks() });
