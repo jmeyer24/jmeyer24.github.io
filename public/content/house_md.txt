@@ -1,0 +1,13 @@
+EKG
+Echocardiography
+Tachycardia
+Hypokalemia
+CT-Scan
+Lumbar Puncture
+MRT
+MRA
+PET-Scan
+PCR
+EMG
+Plasmapheresis (preparative or therapeutic)
+Botulism

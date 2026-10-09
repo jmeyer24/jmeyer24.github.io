@@ -299,5 +299,13 @@
 }
 
 .mute {
-  @apply text-(--color-text)/(--muting-factor)
+  @apply text-(--color-text)/(--muting-factor);
+}
+
+.content-wrapper {
+  @apply flex h-full items-center justify-center mx-auto max-w-6xl px-12 py-12;
+}
+
+.span-break {
+  @apply hidden! sm:inline!;
 }

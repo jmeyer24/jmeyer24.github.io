@@ -35,15 +35,14 @@ $("footer").load("/pages/footer.html")
 // write the content in the main element
 let current_site = window.location.pathname.split('/').filter(Boolean)[0]
 current_site = current_site ? current_site : "welcome";
+$("nav #current-site").html(current_site);
 
 $("main").load(`/pages/${current_site}.html`, function (response, status, xhr) {
     if (status == "error") {
-        console.warn(`Seite ${current_site}.html konnte nicht geladen werden. HTTP-Status: ${xhr.status}`);
-        $("main").load("/pages/404.html");
+        console.warn(`"${current_site}.html" could not be loaded properly. HTTP-status: ${xhr.status}`);
+        $("main").load("/structure/404.html");
     }
 });
-
-$("nav #current-site").html(current_site);
 
 // // create the sidebar image links
 // $(function () { createImageLinks() });
