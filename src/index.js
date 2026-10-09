@@ -24,13 +24,13 @@ $(document.documentElement).on("keydown", function (event) {
 });
 
 // create the navigation bar and the footer bar
-await fetch("/pages/nav.html")
+await fetch("/structure/nav.html")
     .then(response => response.text())
     .then((data) => {
         $("nav").html(data)
     });
 
-$("footer").load("/pages/footer.html")
+$("footer").load("/structure/footer.html")
 
 // write the content in the main element
 let current_site = window.location.pathname.split('/').filter(Boolean)[0]
