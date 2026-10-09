@@ -32,17 +32,55 @@ await fetch("/structure/nav.html")
 
 $("footer").load("/structure/footer.html")
 
-// write the content in the main element
-let current_site = window.location.pathname.split('/').filter(Boolean)[0]
-current_site = current_site ? current_site : "welcome";
-$("nav #current-site").html(current_site);
+$(document).ready(function () {
+    // Check if the user was redirected here via our 404 page
+    const urlParams = new URLSearchParams(window.location.search);
+    const redirectPath = urlParams.get('p');
 
-$("main").load(`/pages/${current_site}.html`, function (response, status, xhr) {
-    if (status == "error") {
-        console.warn(`"${current_site}.html" could not be loaded properly. HTTP-status: ${xhr.status}`);
-        $("main").load("/structure/404.html");
+    let current_site = "welcome";
+
+    if (redirectPath) {
+        // Extract the page name (e.g., "/music" becomes "music")
+        let cleanedPath = redirectPath.split('/').filter(Boolean)[0];
+        if (cleanedPath) {
+            current_site = cleanedPath;
+        }
+
+        // Dynamic UI cleanup: Changes "?p=/music" back to "/music" in the browser's address bar
+        // This keeps the URL looking completely flat and professional!
+        window.history.replaceState(null, null, redirectPath);
+    } else {
+        // Fallback for when someone just visits the root "github.io/" directly
+        let pathName = window.location.pathname.split('/').filter(Boolean)[0];
+        if (pathName) {
+            current_site = pathName;
+        }
     }
+
+    // Update your nav display
+    $("nav #current-site").html(current_site);
+
+    // Load the matching file from your custom directory structure
+    $("main").load(`./pages/${current_site}.html`, function (response, status, xhr) {
+        if (status == "error") {
+            console.warn(`"${current_site}.html" could not be loaded properly. HTTP-status: ${xhr.status}`);
+            $("main").load("./structure/404.html");
+        }
+    });
+
+    // // write the content in the main element
+    // let current_site = window.location.pathname.split('/').filter(Boolean)[0]
+    // current_site = current_site ? current_site : "welcome";
+    // $("nav #current-site").html(current_site);
+
+    // $("main").load(`/pages/${current_site}.html`, function (response, status, xhr) {
+    //     if (status == "error") {
+    //         console.warn(`"${current_site}.html" could not be loaded properly. HTTP-status: ${xhr.status}`);
+    //         $("main").load("/structure/404.html");
+    //     }
+    // });
 });
+
 
 // // create the sidebar image links
 // $(function () { createImageLinks() });

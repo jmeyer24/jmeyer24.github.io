@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Redirecting...</title>
+    <script type="text/javascript">
+        // Capture the exact path the user tried to go to (e.g., "/music")
+        var targetPath = window.location.pathname;
+
+        // Redirect back to the homepage, passing the path as a parameter (?p=/music)
+        window.location.replace(window.location.origin + '?p=' + encodeURIComponent(targetPath));
+    </script>
+</head>
+
+<body>
+</body>
+
+</html>
