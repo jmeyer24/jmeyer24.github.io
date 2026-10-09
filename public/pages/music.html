@@ -2,12 +2,12 @@
     <ul id="medical-list"></ul>
 </div>
 <script>
-    $.get("content/house_md.txt", function (data) {
+    $.get("/content/house_md.txt", function (data) {
         var lines = data.split(/[\r\n]+/);
 
         $.each(lines, function (i, line) {
-            if (line.trim() !== '') {
-                $("#medical-list").append($('<li></li>').text(line));
+            if (line.trim() !== "") {
+                $("#medical-list").append($("<li></li>").text(line));
             }
         });
     });

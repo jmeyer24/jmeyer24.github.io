@@ -1,1 +1,27 @@
-<iframe src="/src/SAFE/index.html" id="my-iframe" class="w-full h-full"></iframe>
+<div id="project-list" class="content-wrapper grid! grid-cols-3 gap-8"></div>
+<script>
+    var projects = {
+        Tonnetz: "Euler's Tonnetz",
+        SuperAwesomeFractalExplorer: "Fractal Explorer",
+        MalazanKnowledgeGraph: "Malazan Graph",
+    };
+
+    // fill the projects div with imaged links
+    Object.entries(projects).forEach(([key, value]) => {
+        $("#project-list").append(
+            `
+            <div class="w-full max-w-xs mx-auto">
+                <a href="/#projects#${key}" class="relative ">
+                    <img 
+                        src="/images/${key}.jpg" 
+                        class="image-rounded object-cover object-top-left" 
+                    />
+                    <div class="project-image-title">
+                        ${value}
+                    </div>
+                </a>
+            </div>
+            `
+        );
+    });
+</script>
