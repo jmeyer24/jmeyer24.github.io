@@ -28,7 +28,8 @@ $(window).on("hashchange", writeContent);
 
 // TODO: on menu-button, toggle menu
 $("#menu-button").on("click", function () {
-    $(".menu").toggleClass("is-open");
+    // $(".menu").toggleClass("is-open");
+    $("main").load("/structure/404.html");
 });
 
 // on keydown, simulate a button click

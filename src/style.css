@@ -9,24 +9,19 @@
 
 :root {
   --transition-time: 0.35s;
-  --border-radius: 1.5rem;
+  --border-radius: 2.5rem;
   --color-muting-factor: 50%;
 
   /* can we use the  @variant dark here for some own color schemes? */
   --color-bg: #0a0a0a; /* --color-bg: transparent; */
-  --color-accent: #020498; /* birthday 0x020498 */
-  --color-high: #1155fa; /* from 2/30 days, 4/12 months and 98/100 century years times 255 each */
-  --color-text: #dfdfff; /* --color-bg: transparent; */
-}
-
-@media only screen and (max-width: 1000px) {
-  :root {
-    --columns: 1;
-  }
+  /* --color-accent: #020498; birthday 0x020498 */
+  /* --color-high: #1155fa; from 2/30 days, 4/12 months and 98/100 century years times 255 each */
+  /* --color-text: #d2d2ff; --color-bg: transparent; */
+  --color-high: #82a6ff;
+  --color-text: #dfdfff;
 }
 
 * {
-  /* time to animate e.g. hover effects */
   transition: var(--transition-time);
 }
 
@@ -34,27 +29,11 @@
 /* sectioning */
 /* ========== */
 .content-wrapper {
-  @apply flex h-full items-center justify-center mx-auto max-w-6xl px-12 py-12;
+  @apply flex h-full items-center justify-center px-12 py-12;
 }
 
-.span-break {
+.hidden-till-sm {
   @apply hidden! sm:inline!;
-}
-
-.divider-t {
-  border-top: 0.5px solid var(--color-high);
-}
-
-.divider-b {
-  border-bottom: 0.5px solid var(--color-high);
-}
-
-.divider-l {
-  border-left: 0.5px solid var(--color-high);
-}
-
-.divider-r {
-  border-right: 0.5px solid var(--color-high);
 }
 
 .gradient-t {
@@ -63,42 +42,6 @@
 
 .gradient-b {
   @apply rounded-xl bg-linear-to-b from-(--color-bg) from-50% to-(--color-high)/50;
-}
-
-.gradient-l {
-  @apply rounded-3xl bg-linear-to-l from-(--color-bg) from-50% to-(--color-high)/50;
-}
-
-.gradient-r {
-  @apply rounded-3xl bg-linear-to-r from-(--color-bg) from-50% to-(--color-high)/50;
-}
-
-/* ===== */
-/* links */
-/* ===== */
-.link-text {
-  @apply underline hover:text-(--color-high) transition-colors;
-}
-
-.link-nav {
-  border-radius: calc(var(--border-radius) - 2px);
-  padding-inline: calc(var(--spacing) * 3);
-  padding-block: calc(var(--spacing) * 3);
-}
-
-.link-nav:hover {
-  background-color: var(--color-high);
-}
-
-.link-social {
-  @apply hover:text-(--color-high) transition-colors;
-}
-
-/* ============ */
-/* project list */
-/* ============ */
-.project-image-title {
-  @apply absolute size-full top-1/2 left-1/2 -translate-1/2 rounded-(--border-radius) flex items-center justify-center text-center text-shadow-[-1px_1px_2px_var(--color-high),1px_1px_1px_var(--color-bg)] bg-(--color-high) opacity-0 duration-(--transition-time) ease-in-out hover:opacity-90;
 }
 
 /* ========= */
@@ -116,14 +59,40 @@
   color: var(--color-high);
 }
 
-.accent {
-  color: var(--color-accent);
-}
-
 .mute {
   @apply text-(--color-text)/(--color-muting-factor);
 }
 
-.image-rounded {
-  @apply rounded-(--border-radius) w-full aspect-square;
+/* ===== */
+/* links */
+/* ===== */
+a.nav {
+  @apply rounded-2xl p-3 hover:bg-(--color-high);
+}
+
+a.social {
+  @apply hover:text-(--color-high) transition-colors;
+}
+
+a.text {
+  @apply underline hover:text-(--color-high) transition-colors;
+}
+
+/* ==================== */
+/* buttons, images, ... */
+/* ==================== */
+img.rounded-image {
+  @apply w-full aspect-square rounded-(--border-radius);
+}
+
+.topic-container {
+  @apply p-5 border-b border-r rounded-(--border-radius) border-(--color-text)/(--color-muting-factor);
+}
+
+.topic-title {
+  @apply mt-0 font-bold text-(--color-high);
+}
+
+.topic-extract {
+  @apply leading-6 text-(--color-text);
 }

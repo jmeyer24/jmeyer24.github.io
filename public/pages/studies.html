@@ -1,0 +1,51 @@
+<div id="wiki-topics" class="content-wrapper grid! grid-cols-3 gap-9"></div>
+
+<script>
+    function fetchListOfWikipediaTopics(list_file) {
+        $.get(list_file, function (data) {
+            const topics = data.split(/[\r\n]+/);
+
+            $.each(topics, function (i, topic) {
+                const trimmedTopic = topic.trim();
+                if (trimmedTopic !== "") {
+                    const uniqueId = `topic-${i}`;
+                    const topicHtml = `
+                        <div id="${uniqueId}" class="topic-container h-full">
+                            <h2 class="topic-title"></h2>
+                            <p class="topic-extract">Load ${trimmedTopic}...</p>
+                        </div>
+                    `;
+                    $('#wiki-topics').append(topicHtml);
+
+                    // Encode the topic string to make it safe for the URL path
+                    const encodedTopic = encodeURIComponent(trimmedTopic.replace(/ /g, '_'));
+                    // Modern Wikipedia REST API endpoint (Supports Native CORS required by jQuery 4)
+                    const apiUrl = `https://en.wikipedia.org/api/rest_v1/page/summary/${encodedTopic}`;
+
+                    $.ajax({
+                        url: apiUrl,
+                        method: "GET",
+                        headers: {
+                            // Wikipedia strictly requests a custom User-Agent header for tracking API use
+                            'Api-User-Agent': 'jmeyer24.github.io/1.0 (jakobmeyer.feu@gmail.com)'
+                        },
+                        dataType: "json",
+                        success: function (data) {
+                            $(`#${uniqueId} .topic-title`).text(data.title);
+                            $(`#${uniqueId} .topic-extract`).text(data.extract || "No summary available.");
+
+                        },
+                        error: function (err) {
+                            console.error(`Error fetching data for ${trimmedTopic}`, err);
+                            $(`#${uniqueId} .topic-extract`).text(`Error loading: ${trimmedTopic}`);
+                        }
+                    });
+                }
+            });
+        });
+    }
+
+    $(document).ready(
+        function () { fetchListOfWikipediaTopics("/content/house_md.txt") }
+    );
+</script>
