@@ -1,0 +1,214 @@
+@import "tailwindcss";
+
+:root {
+  --noteScaling: 1;
+  --color: #000;
+  --background-color: #fff;
+  --standardColor: #5a4;
+  --rootColor: red;
+  --destinationColor: gold;
+  --scaleColor: blue;
+  --left: 0px;
+  --top: 0px;
+  --width: 0px;
+  --height: 0px;
+  --menuWidth: 130px;
+  --menuHeight: 130px;
+  --transitionSpeed: 0.7s;
+  --padding: 20px;
+  --tagWidth: 10px;
+  --extraTagWidth: 5px;
+  --borderStyle: solid;
+}
+
+.menuNote {
+  position: absolute;
+  z-index: inherit;
+
+  /* styling */
+  border-radius: 50%;
+  padding: var(--padding);
+  /* transition: all 100ms ease-out; */
+
+  /* to align in center */
+  display: flex;
+  /* horizontally */
+  justify-content: center;
+  /* vertically */
+  align-items: center;
+  /* addition for the 2 line notes */
+  white-space: pre-wrap;
+
+  /* dont be able to select note string */
+  user-select: none;
+
+  /* variables in use here */
+  /* to center on vertex point */
+  transform: scale(var(--noteScaling))
+    translate(
+      calc(-50 / var(--noteScaling) * 1%),
+      calc(-50 / var(--noteScaling) * 1%)
+    );
+  color: var(--color);
+  background-color: var(--background-color);
+  width: var(--width);
+  height: var(--height);
+  left: calc(var(--menuWidth) / 2);
+  top: calc(var(--menuHeight) / 2);
+}
+
+.note {
+  position: absolute;
+  /* transition: padding 0.8s; */
+
+  /* styling */
+  border-radius: 50%;
+  padding: var(--padding);
+  transition: all 200ms linear;
+
+  /* to align in center */
+  display: flex;
+  /* horizontally: flexbox */
+  justify-content: center;
+  /* horizontally: text */
+  text-align: center;
+  /* vertically */
+  align-items: center;
+  /* addition for the 2 line notes */
+  white-space: pre-wrap;
+
+  /* dont be able to select note string */
+  user-select: none;
+
+  /* variables in use here */
+  /* to center on vertex point */
+  transform: scale(var(--noteScaling))
+    translate(
+      calc(-50 / var(--noteScaling) * 1%),
+      calc(-50 / var(--noteScaling) * 1%)
+    );
+  color: var(--color);
+  background-color: var(--background-color);
+  left: var(--left);
+  top: var(--top);
+  width: var(--width);
+  height: var(--height);
+}
+
+.note:hover {
+  /* padding: calc(var(--padding) * var(--noteScaling)); */
+  /* --noteScaling: 1.25; */
+  border-width: var(--extraTagWidth);
+  border-style: var(--borderStyle);
+  border-color: var(--rootColor);
+}
+
+.note.root {
+  border-width: var(--tagWidth);
+  border-style: var(--borderStyle);
+  border-color: var(--rootColor);
+  /* --noteScaling: 1.25; */
+}
+
+.note.chordNote {
+  border-width: var(--tagWidth);
+  border-style: var(--borderStyle);
+  border-color: var(--standardColor);
+  /* --noteScaling: 1.25; */
+}
+
+.note.destination {
+  border-width: var(--tagWidth);
+  border-style: var(--borderStyle);
+  border-color: var(--destinationColor);
+  /* --noteScaling: 1.25; */
+}
+
+.note.scaleNote {
+  border-width: var(--tagWidth);
+  border-style: var(--borderStyle);
+  border-color: var(--standardColor);
+  /* --noteScaling: 1.25; */
+}
+
+.note.scaleNote.extra {
+  /* border-width: var(--extraTagWidth); */
+  /* border-style: var(--borderStyle); */
+  /* border-color: var(--scaleColor); */
+  /* --noteScaling: 1; */
+}
+
+/* .noteName:hover{ */
+/* transition: all 0ms ease-in; */
+/* transform: scale(1.25) translate(-40%, -40%); */
+/* this doesnt work when backgroundColor is set in .js */
+/* background-color: red; */
+/* } */
+
+/* ============ */
+/* menu */
+/* https://codepen.io/Francini90/pen/pYvEzO */
+/* ============ */
+
+.menu {
+  position: absolute;
+  z-index: 1;
+
+  /* background-color: var(--background-color); */
+  /* background-color: red; */
+  height: var(--menuHeight);
+  width: var(--menuWidth);
+  /* transform: scale(0); */
+  border-radius: 50%;
+  /* border-style: double; */
+  /* border-color: var(--background-color); */
+  background-color: var(--standardColor);
+
+  margin: auto;
+
+  /* top: 0px;
+  bottom: 0px;
+  left: 0px;
+  right: 0px; */
+  transition: all var(--transitionSpeed);
+
+  /* variables in use here */
+  transform: scale(var(--noteScaling))
+    translate(
+      calc(-50 / var(--noteScaling) * 1%),
+      calc(-50 / var(--noteScaling) * 1%)
+    );
+  /* color: var(--color); */
+  /* background-color: var(--background-color); */
+  left: var(--left);
+  top: var(--top);
+  /* width: var(--width);
+  height: var(--height); */
+}
+
+.menuPart {
+  position: absolute;
+  z-index: 2;
+
+  /* display: inline-block; */
+  /* font-size: 15px; */
+  color: #f00;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  /* variables in use here */
+  /* to center on vertex point */
+  transform: scale(var(--noteScaling))
+    translate(
+      calc(-50 / var(--noteScaling) * 1%),
+      calc(-50 / var(--noteScaling) * 1%)
+    );
+  color: var(--color);
+  background-color: var(--background-color);
+  width: var(--width);
+  height: var(--height);
+  left: calc(var(--menuWidth) / 2);
+  top: calc(var(--menuHeight) / 2);
+}
