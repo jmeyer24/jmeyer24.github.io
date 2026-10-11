@@ -6,24 +6,30 @@ await fetch("/structure/nav.html")
         $("nav").html(data)
     });
 
-// load the main content
+// load and write the main content
 function writeContent() {
+    // redirect to welcome page if on root
+    if (window.location.hash == "") {
+        window.location.hash = "welcome";
+    }
+    // get the page name/path
+    let current_page = window.location.hash.split("#").filter(Boolean);
+    let nav_current_page = current_page.slice(-1)[0];
+    current_page = current_page.join("/");
     // write the content in the main element
-    let current_site = window.location.hash.split("#").filter(Boolean)[0];
-    current_site = current_site ? current_site : "welcome";
-
-    $("main").load(`/pages/${current_site}.html`, function (response, status, xhr) {
+    $("main").load(`/pages/${current_page}.html`, function (response, status, xhr) {
         if (status == "error") {
-            console.warn(`"${current_site}.html" could not be loaded properly. HTTP-status: ${xhr.status}`);
+            console.warn(`"${current_page}.html" could not be loaded properly. HTTP-status: ${xhr.status}`);
             $("main").load("/structure/404.html");
         }
     });
-    $("nav #current-site").html(current_site);
+    // update the navigation title
+    $("nav #current-site").html(nav_current_page);
 }
 
 $(document).ready(writeContent);
 
-// when the hash changes (due to nav link clicks), reload the main content
+// when the hash changes (due to nav link clicks), update the main content
 $(window).on("hashchange", writeContent);
 
 // TODO: on menu-button, toggle menu

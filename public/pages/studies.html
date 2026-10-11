@@ -5,7 +5,7 @@
         $.get(list_file, function (data) {
             const topics = data.split(/[\r\n]+/).sort();
 
-            $.each(topics, function (i, topic) {
+            topics.forEach((topic, i) => {
                 const trimmedTopic = topic.trim();
                 if (trimmedTopic !== "") {
                     const uniqueId = `topic-${i}`;
