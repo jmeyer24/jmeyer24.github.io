@@ -1,9 +1,9 @@
-<div id="wiki-topics" class="content-wrapper grid! grid-cols-3 gap-9"></div>
+<div id="wiki-topics" class="content-wrapper grid! md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
 
 <script>
     function fetchListOfWikipediaTopics(list_file) {
         $.get(list_file, function (data) {
-            const topics = data.split(/[\r\n]+/);
+            const topics = data.split(/[\r\n]+/).sort();
 
             $.each(topics, function (i, topic) {
                 const trimmedTopic = topic.trim();
@@ -31,7 +31,7 @@
                         },
                         dataType: "json",
                         success: function (data) {
-                            $(`#${uniqueId} .topic-title`).text(data.title);
+                            $(`#${uniqueId} .topic-title`).html(`<a href="https://en.wikipedia.org/wiki/${data.title}">${data.title}</a>`);
                             $(`#${uniqueId} .topic-extract`).text(data.extract || "No summary available.");
 
                         },
