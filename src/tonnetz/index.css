@@ -2,12 +2,17 @@
 
 :root {
   --noteScaling: 1;
-  --color: #000;
-  --background-color: #fff;
-  --standardColor: #5a4;
-  --rootColor: red;
-  --destinationColor: gold;
-  --scaleColor: blue;
+
+  --color-text: rgb(0, 0, 0);
+  --color-button: rgb(255, 255, 255);
+  --color-background: lch(90.03% 16.13 291.48);
+  --color-major: hsl(41, 50%, 74%);
+  --color-minor: hsl(209, 50%, 56%);
+  --color-root: hsl(0, 100%, 50%);
+  --color-chordNote: hsl(0, 80%, 80%);
+  --color-destination: hsl(51, 100%, 50%);
+  --color-scaleNote: hsl(240, 60%, 90%);
+
   --left: 0px;
   --top: 0px;
   --width: 0px;
@@ -58,83 +63,43 @@
 }
 
 .note {
-  position: absolute;
-  /* transition: padding 0.8s; */
+  /* transition: all 300ms linear; */
+  /* transition: padding 3.8s; */
 
-  /* styling */
-  border-radius: 50%;
-  padding: var(--padding);
-  transition: all 200ms linear;
-
-  /* to align in center */
-  display: flex;
-  /* horizontally: flexbox */
-  justify-content: center;
-  /* horizontally: text */
-  text-align: center;
-  /* vertically */
-  align-items: center;
-  /* addition for the 2 line notes */
-  white-space: pre-wrap;
-
-  /* dont be able to select note string */
-  user-select: none;
-
-  /* variables in use here */
-  /* to center on vertex point */
-  transform: scale(var(--noteScaling))
-    translate(
-      calc(-50 / var(--noteScaling) * 1%),
-      calc(-50 / var(--noteScaling) * 1%)
-    );
-  color: var(--color);
-  background-color: var(--background-color);
-  left: var(--left);
-  top: var(--top);
-  width: var(--width);
-  height: var(--height);
+  @apply absolute select-none flex justify-center items-center text-center scale-(--noteScaling) -translate-1/2 p-8 rounded-[50%];
 }
 
 .note:hover {
-  /* padding: calc(var(--padding) * var(--noteScaling)); */
-  /* --noteScaling: 1.25; */
   border-width: var(--extraTagWidth);
   border-style: var(--borderStyle);
-  border-color: var(--rootColor);
+  border-color: var(--color-root);
+}
+
+.note.marked {
+  border-width: var(--tagWidth);
+  border-style: var(--borderStyle);
 }
 
 .note.root {
-  border-width: var(--tagWidth);
-  border-style: var(--borderStyle);
-  border-color: var(--rootColor);
-  /* --noteScaling: 1.25; */
+  border-color: var(--color-root);
 }
 
 .note.chordNote {
-  border-width: var(--tagWidth);
-  border-style: var(--borderStyle);
-  border-color: var(--standardColor);
-  /* --noteScaling: 1.25; */
+  border-color: var(--color-chordNote);
 }
 
 .note.destination {
-  border-width: var(--tagWidth);
-  border-style: var(--borderStyle);
-  border-color: var(--destinationColor);
-  /* --noteScaling: 1.25; */
+  border-color: var(--color-destination);
 }
 
 .note.scaleNote {
-  border-width: var(--tagWidth);
-  border-style: var(--borderStyle);
-  border-color: var(--standardColor);
-  /* --noteScaling: 1.25; */
+  border-color: var(--color-scaleNote);
 }
 
 .note.scaleNote.extra {
   /* border-width: var(--extraTagWidth); */
   /* border-style: var(--borderStyle); */
-  /* border-color: var(--scaleColor); */
+  /* border-color: var(--color-scaleNote); */
   /* --noteScaling: 1; */
 }
 
@@ -162,7 +127,7 @@
   border-radius: 50%;
   /* border-style: double; */
   /* border-color: var(--background-color); */
-  background-color: var(--standardColor);
+  background-color: var(--color-background);
 
   margin: auto;
 
@@ -205,8 +170,8 @@
       calc(-50 / var(--noteScaling) * 1%),
       calc(-50 / var(--noteScaling) * 1%)
     );
-  color: var(--color);
-  background-color: var(--background-color);
+  color: var(--color-text);
+  background-color: var(--color-button);
   width: var(--width);
   height: var(--height);
   left: calc(var(--menuWidth) / 2);
