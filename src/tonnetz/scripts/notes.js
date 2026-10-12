@@ -1,10 +1,15 @@
 import { config } from "./config";
-import { mod, isDiatonic } from "./utilities";
+import { mod, drawPianoKeys } from "./utilities";
 
 $("body").append(`<div id="noteBin"></div>`);
 const scaling = config.display.scaling * config.display.unknownScaling;
 
 function drawNotes() {
+    const {
+        display: { notesPerRow, vertices },
+        note: { indices, names }
+    } = config;
+
     $("#noteBin").empty();
     const center = {
         x: window.innerWidth / 2,
@@ -12,36 +17,45 @@ function drawNotes() {
     };
 
     // create the notes on the tonnetz
-    for (let i = 0; i < (config.display.notesPerRow) ** 2; i++) {
+    for (let i = 0; i < (notesPerRow) ** 2; i++) {
         const offset = {
-            x: scaling * config.display.vertices[i * 3],
-            y: scaling * config.display.vertices[i * 3 + 1]
+            x: scaling * vertices[i * 3],
+            y: scaling * vertices[i * 3 + 1]
         };
 
         // add a note to the noteBin
+        const noteDiv = `
+            <div class="note w-0 h-0"
+                style="
+                    left: ${center.x + offset.x}px; 
+                    top: ${center.y - offset.y}px; 
+                    color: var(${drawPianoKeys(indices[i]) ? "--color-text" : "--color-button"}); 
+                    background-color: var(${drawPianoKeys(indices[i]) ? "--color-button" : "--color-text"})
+                "
+            >
+                ${names[indices[i]]}
+            </div>
+        `;
         $("#noteBin")
-            .append($(
-                `<div class="note w-0 h-0"
-                    style="left: ${center.x + offset.x}px; top: ${center.y - offset.y}px; color: ${isDiatonic(config.note.indices[i]) ? "--color-background" : "--color-background"}; background-color: ${isDiatonic(config.note.indices[i]) ? "--color-background" : "--color-background"}">
-                    ${config.note.names[config.note.indices[i]]}
-                </div>`)
-                .click((event) => {
-                    // mouseclick events: center menu on clicked note and color chord
-                    if (event.shiftKey) {
-                        // center the destination note on the clicked note when shift+mouseclick
-                        config.note.destination = i;
-                        markChord(true);
-                    } else if (event.ctrlKey) {
-                        // center the tonnetz on the clicked note when strg+mouseclick
-                        recenterTonnetzByPatternIndex(i);
-                        markChord(true);
-                    } else {
-                        // center the chord on the clicked note
-                        config.note.root = i;
-                        markChord();
-                    }
-                })
-            )
+            .append(
+                $(noteDiv)
+                    .click((event) => {
+                        // mouseclick events: center menu on clicked note and color chord
+                        if (event.shiftKey) {
+                            // center the destination note on the clicked note when shift+mouseclick
+                            config.note.destination = i;
+                            markNotes(true);
+                        } else if (event.ctrlKey) {
+                            // center the tonnetz on the clicked note when strg+mouseclick
+                            recenterTonnetzByPatternIndex(i);
+                            markNotes(true);
+                        } else {
+                            // center the chord on the clicked note
+                            config.note.root = i;
+                            markNotes();
+                        }
+                    })
+            );
     }
 }
 
@@ -51,64 +65,82 @@ function updateNoteIndices() {
 
     return: null (implicit change in config)
     */
-    config.note.indices = config.note.defaultIndices.map(value => mod(value + config.note.offset, config.note.names.length));
-    config.note.destinationIndices = config.note.defaultIndices.map(value => mod(value + config.note.offset - config.note.indices[config.note.root], config.note.names.length));
+    const { indices, defaultIndices, offset, names, root } = config.note;
+
+    config.note.indices = defaultIndices.map(value => mod(value + offset, names.length));
+    config.note.destinationIndices = defaultIndices.map(value => mod(value + offset - indices[root], names.length));
 }
 
 function updateNotes() {
     updateNoteIndices();
+    // TODO: instead of redrawing, just change the htmls of the already drawn notes
     drawNotes();
-
-    // instead of redrawing, just change the htmls of the already drawn notes
 }
 
 function updateChordPossibilites() {
-    config.chord.possibilities = [];
-    Object.entries(config.chord.options).forEach(([_, option], index) => {
-        let hsFromRoot = config.note.destinationIndices[config.note.destination];
+    const {
+        note: { destination, destinationIndices },
+        chord: { options, possibilities },
+    } = config;
+
+    possibilities.length = 0; // leert das config array
+    Object.entries(options).forEach(([_, option], index) => {
+        let hsFromRoot = destinationIndices[destination];
         if (option.includes(hsFromRoot)) {
-            config.chord.possibilities.push(index);
+            possibilities.push(index);
         }
-    })
+    });
 }
 
 function updateScalePossibilites() {
     /*
     check which scale is a possibility for the current chord
     */
-    const chord = config.chord.options[config.chord.optionMap[config.chord.current]];
+    const {
+        chord: { options: options_c, names, current },
+        scale: { options: options_s, possibilities },
+    } = config;
 
-    config.scale.possibilities = [];
-    Object.entries(config.scale.options).forEach(([_, option], index) => {
+    const chord = options_c[names[current]];
+
+    possibilities.length = 0; // leert das config array
+    Object.entries(options_s).forEach(([_, option], index) => {
         if (chord.every(element => option.includes(element))) {
-            config.scale.possibilities.push(index);
+            possibilities.push(index);
         }
-    })
+    });
 }
 
 function recenterTonnetzByPatternIndex(index) {
-    config.note.offset = config.note.indices[index];
-    config.note.root = config.note.center;
-    config.note.destination = config.note.center;
+    const { note: { indices, center } } = config
+
+    config.note.offset = indices[index];
+    config.note.root = center;
+    config.note.destination = center;
     updateNotes();
 }
 
-function markChord(disableToggle = false) {
+function markNotes(disableToggle = false) {
+    const {
+        display: { notesPerRow },
+        note: { names: names_n, indices, differentNotes, root, destination, destinationIndices, intervals },
+        chord: { options: options_c, names: names_c, current: current_c, halfstepMap },
+        scale: { options: options_s, names: names_s, current: current_s, possibilities, toggle, namesRoman, currentPossibility },
+    } = config;
+
     // TODO: restrictions to the tonnetz, as indices go out of bounds
 
-    // make sure chord.current is valid
-    config.chord.current = mod(config.chord.current, Object.keys(config.chord.options).length);
-
     // get the array of halfsteps from the root
-    const chord = config.chord.options[config.chord.optionMap[config.chord.current]];
+    let chord = options_c[names_c[current_c]];
+    chord.forEach((element, i, array) => array[i] = mod(element, differentNotes));
 
     // remove all previous coloring
-    let isRoot = $("#noteBin div").eq(config.note.root).hasClass("root");
+    let isRoot = $("#noteBin div").eq(root).hasClass("root");
     $("#noteBin").children().each(function (index) {
         $(this)
             .removeClass("marked root chordNote destination scaleNote")
-            .html(`${config.note.names[config.note.indices[index]]}`)
-    })
+            .html(`${names_n[indices[index]]}`);
+    });
 
     if (disableToggle) {
         isRoot = false;
@@ -120,70 +152,63 @@ function markChord(disableToggle = false) {
         let name = "";
 
         // mark scale notes
-        if (config.scale.toggle && config.scale.possibilities.length > 0) {
-            const scale = config.scale.options[config.scale.optionMap[config.scale.current]];
+        if (toggle && possibilities.length > 0) {
+            const scale = options_s[names_s[current_s]];
             if (scale) {
-                const newScale = scale.map(element => mod(element + config.note.indices[config.note.root], config.note.names.length))
-                config.note.indices.forEach((element, index) => {
+                const newScale = scale.map(element => mod(element + indices[root], names_n.length));
+                indices.forEach((element, index) => {
                     if (newScale.includes(element)) {
                         $("#noteBin div")
                             .eq(index)
-                            .addClass("marked scaleNote extra")
+                            .addClass("marked scaleNote extra");
                     }
-                })
-                scale.forEach(halfsteps => {
-                    $("#noteBin div")
-                        .eq(config.note.root + config.scale.halfstepMap[halfsteps])
-                        .removeClass("marked scaleNote extra")
-                })
+                });
             }
         }
 
         // mark destination note
-        if (config.note.destination != config.note.root) {
-            name = `${config.note.names[config.note.indices[config.note.destination]] + "\n" + config.note.intervals[config.note.destinationIndices[config.note.destination]]}`;
+        if (destination != root) {
+            name = `${names_n[indices[destination]] + "\n" + intervals[destinationIndices[destination]]}`;
             $("#noteBin div")
-                .eq(config.note.destination)
+                .eq(destination)
                 .removeClass("marked scaleNote")
                 .addClass("marked destination")
-                .html(name)
+                .html(name);
         }
 
         // mark chord notes
-        chord.map(i => config.chord.halfstepMap[i]).forEach((halfsteps, index) => {
-            const k = config.note.root + halfsteps;
-            if (k < (config.display.notesPerRow) ** 2) {
-                if (k == config.note.root) {
+        chord.map(i => halfstepMap[i]).forEach((halfsteps, index) => {
+            const k = root + halfsteps;
+            if (k < (notesPerRow) ** 2) {
+                if (k == root) {
                     // write scale or chord name at root
-                    if (config.scale.toggle && config.scale.possibilities.length > 0) {
-                        name = `${config.note.names[config.note.indices[k]] + "\n" + config.scale.functionMap[config.scale.possibilities[config.scale.currentPossibility]]}`;
+                    if (toggle && possibilities.length > 0) {
+                        name = `${names_n[indices[k]] + "\n" + namesRoman[possibilities[currentPossibility]]}`;
                     } else {
-                        name = `${config.note.names[config.note.indices[k]] + "\n" + config.chord.optionMap[config.chord.current]}`;
+                        name = `${names_n[indices[k]] + "\n" + names_c[current_c]}`;
                     }
                 } else {
                     // write chord function of non-root notes
-                    name = `${config.note.names[config.note.indices[k]] + "\n" + config.note.intervals[chord[index]]}`;
+                    name = `${names_n[indices[k]] + "\n" + intervals[chord[index]]}`;
                 }
                 $("#noteBin div").eq(k)
                     .removeClass("marked scaleNote destination")
-                    .addClass((k == config.note.root) ? "marked root" : "marked chordNote")
-                    .html(name)
+                    .addClass((k == root) ? "marked root" : "marked chordNote")
+                    .html(name);
             }
         });
     }
 }
 function scrollThroughChords(event) {
+    const { current, options } = config.chord;
+
     // deltaY obviously records vertical scroll, deltaX and deltaZ exist too.
-    // this condition makes sure it's vertical scrolling that happened
-    if (event.originalEvent.deltaY !== 0) {
-        if (event.originalEvent.deltaY < 0) {
-            config.chord.current += 1;
-        }
-        else {
-            config.chord.current -= 1;
-        }
+    // this condition makes sure it's vertical scrolling that changes chords
+    const delta = event.originalEvent.deltaY;
+    if (delta !== 0) {
+        config.chord.current = mod(delta < 0 ? current + 1 : current - 1, Object.keys(options).length);
     }
-    markChord(true);
+    markNotes(true);
 }
 
-export { markChord, drawNotes, scrollThroughChords, updateNoteIndices, updateNotes, updateChordPossibilites, updateScalePossibilites, recenterTonnetzByPatternIndex };
+export { markNotes, drawNotes, scrollThroughChords, updateNoteIndices, updateNotes, updateChordPossibilites, updateScalePossibilites, recenterTonnetzByPatternIndex };

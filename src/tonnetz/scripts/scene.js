@@ -47,48 +47,54 @@ function clearTonnetz() {
 }
 
 function drawTonnetz() {
+    const {
+        display: { vertices, normals, indices, segments, notesPerRow, scaling },
+        note: { defaultIndices, names }
+    } = config;
+
     // generate vertices and normals for a simple grid geometry
-    config.display.vertices = [];
-    config.display.normals = [];
-    config.display.indices = [];
+    vertices.length = 0;
+    normals.length = 0;
+    indices.length = 0;
 
     // compute a patch of even-sided triangles
-    for (let i = 0; i <= config.display.segments; i++) {
-        const y = (i / config.display.segments - 0.5) * Math.sqrt(0.75);
+    for (let i = 0; i <= segments; i++) {
+        const y = (i / segments - 0.5) * Math.sqrt(0.75);
 
-        for (let j = 0; j <= config.display.segments; j++) {
-            const x = ((j - i / 2) / config.display.segments - 0.25);
+        for (let j = 0; j <= segments; j++) {
+            const x = ((j - i / 2) / segments - 0.25);
 
-            config.display.vertices.push(x, -y, 0);
-            config.display.normals.push(0, 0, 1);
+            vertices.push(x, -y, 0);
+            normals.push(0, 0, 1);
         }
     }
 
     // generate indices (data for element array buffer)
-    for (let i = 0; i < config.display.segments; i++) {
-        for (let j = 0; j < config.display.segments; j++) {
-            const a = i * (config.display.notesPerRow) + (j + 1);
-            const b = i * (config.display.notesPerRow) + j;
-            const c = (i + 1) * (config.display.notesPerRow) + j;
-            const d = (i + 1) * (config.display.notesPerRow) + (j + 1);
+    for (let i = 0; i < segments; i++) {
+        for (let j = 0; j < segments; j++) {
+            const a = i * (notesPerRow) + (j + 1);
+            const b = i * (notesPerRow) + j;
+            const c = (i + 1) * (notesPerRow) + j;
+            const d = (i + 1) * (notesPerRow) + (j + 1);
 
             // generate two faces (triangles) per iteration
-            config.display.indices.push(a, b, d); // face one
-            config.display.indices.push(b, c, d); // face two
+            indices.push(a, b, d); // face one
+            indices.push(b, c, d); // face two
         }
     }
 
     // compute nodeIndices, e.g. which circle represents which note
-    config.note.defaultIndices = [0];
-    for (let i = 1; i < (config.display.notesPerRow) ** 2; i++) {
-        config.note.defaultIndices.push(
+    defaultIndices.length = 0;
+    defaultIndices.push(0);
+    for (let i = 1; i < (notesPerRow) ** 2; i++) {
+        defaultIndices.push(
             // when we are at a new row in the tonnetz
             // compute the new start of the row
             // else go to the fifth (7 halfsteps)
-            (!(i % (config.display.notesPerRow))
-                ? (i / (config.display.notesPerRow)) * 8
-                : config.note.defaultIndices[i - 1] + 7)
-            % config.note.names.length
+            (!(i % (notesPerRow))
+                ? (i / (notesPerRow)) * 8
+                : defaultIndices[i - 1] + 7)
+            % names.length
         );
     }
 
@@ -101,19 +107,19 @@ function drawTonnetz() {
     }
 
     // draw the plane
-    for (let i = 0; i < 2 * config.display.segments ** 2; i++) {
+    for (let i = 0; i < 2 * segments ** 2; i++) {
         const geometry = new THREE.BufferGeometry();
         geometry.setIndex([0, 1, 2]);
 
         // get position and normal information of both triangles (front back)
-        const vertices = indexedReadyForBuffer(i, config.display.indices, config.display.vertices);
-        const normals = indexedReadyForBuffer(i, config.display.indices, config.display.normals);
-        geometry.setAttribute("position", new THREE.Float32BufferAttribute(vertices.map((i) => i * config.display.scaling), 3));
-        geometry.setAttribute("normal", new THREE.Float32BufferAttribute(normals, 3));
+        const bufferVertices = indexedReadyForBuffer(i, indices, vertices);
+        const bufferNormals = indexedReadyForBuffer(i, indices, normals);
+        geometry.setAttribute("position", new THREE.Float32BufferAttribute(bufferVertices.map((i) => i * scaling), 3));
+        geometry.setAttribute("normal", new THREE.Float32BufferAttribute(bufferNormals, 3));
 
         const color = new THREE.Color(i % 2 ? config.color.major : config.color.minor);
-        const bufferedColor = new Array(3).fill(color.toArray()).flat()
-        geometry.setAttribute("color", new THREE.Float32BufferAttribute(bufferedColor, 3));
+        const bufferColor = new Array(3).fill(color.toArray()).flat()
+        geometry.setAttribute("color", new THREE.Float32BufferAttribute(bufferColor, 3));
 
         const material = new THREE.MeshBasicMaterial({ vertexColors: true });
 

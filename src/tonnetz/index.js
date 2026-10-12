@@ -1,6 +1,6 @@
 import { setup, resize, animate } from "./scripts/scene";
 
-import { drawNotes } from "./scripts/notes";
+import { drawNotes, markNotes } from "./scripts/notes";
 
 import { initGui } from "./scripts/gui";
 import { initMenu } from "./scripts/menu";
@@ -27,15 +27,16 @@ import { initEvents } from "./scripts/events";
 // +CTRL: instead move destination note to root
 
 function update() {
-    resize();
-    drawNotes();
+  resize();
+  drawNotes();
+  markNotes();
 }
 
 setup();
 update();
 
 initGui();
-initMenu();
+// initMenu();
 
 initEvents();
 $(window).on("resize", update);
