@@ -5,13 +5,15 @@
 
   --color-text: rgb(0, 0, 0);
   --color-button: rgb(255, 255, 255);
-  --color-background: lch(90.03% 16.13 291.48);
+  --color-background: rgb(224, 224, 255);
   --color-major: hsl(41, 50%, 74%);
+  --color-major: hsl(240, 100%, 84%);
   --color-minor: hsl(209, 50%, 56%);
-  --color-root: hsl(0, 100%, 50%);
+  --color-minor: rgb(224, 224, 255);
+  --color-root: hsl(236, 100%, 50%);
   --color-chordNote: hsl(0, 80%, 80%);
   --color-destination: hsl(51, 100%, 50%);
-  --color-scaleNote: hsl(240, 60%, 90%);
+  --color-scaleNote: hsl(162, 62%, 51%);
 
   --left: 0px;
   --top: 0px;
@@ -115,7 +117,7 @@
 /* https://codepen.io/Francini90/pen/pYvEzO */
 /* ============ */
 
-.menu {
+#menu {
   position: absolute;
   z-index: 1;
 
