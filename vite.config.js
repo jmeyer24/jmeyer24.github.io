@@ -6,4 +6,13 @@ export default defineConfig({
   plugins: [
     tailwindcss(),
   ],
+  build: {
+    rollupOptions: {
+      input: {
+        main: './index.html',
+        tonnetz: './projects/tonnetz/index.html',
+        SAFE: './projects/SAFE/index.html',
+      }
+    }
+  }
 })

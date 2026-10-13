@@ -11,7 +11,7 @@
 
     // fill the projects div with imaged links
     Object.entries(projects).forEach(([key, value]) => {
-        const imgUrl = new URL(`../src/bin/images/${key}.jpg`, import.meta.url).href;
+        const imgUrl = new URL(`/images/${key}.jpg`, import.meta.url).href;
 
         $("#project-list").append(
             `
