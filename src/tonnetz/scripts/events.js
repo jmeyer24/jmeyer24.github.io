@@ -1,12 +1,12 @@
 import { config } from "./config";
 import { mod } from "./utilities";
-import { markNotes, scrollThroughChords, updateNoteIndices, updateNotes, updateChordPossibilites, updateScalePossibilites, recenterTonnetzByPatternIndex, drawNotes } from "./notes";
+import { markNotes, scrollThroughChords, updateNoteIndices, updateNotes, recenterTonnetzByPatternIndex, drawNotes } from "./notes";
 
 function initEvents() {
     // on event callback functions
     $(window).on('wheel', scrollThroughChords);
     $(window).keydown(function (event) {
-        // console.log(event.which);
+        console.log(event.which);
         switch (event.which) {
             case 13: // enter: recenter on root note
                 keydownEnter(event);
@@ -16,44 +16,76 @@ function initEvents() {
                 drawNotes();
                 markNotes();
                 break;
+
+            // movement
             case 37: // on left
                 keydownArrow(event, 5)
+                markNotes();
                 break;
             case 38: // on up
                 keydownArrow(event, 9)
+                markNotes();
                 break;
             case 39: // on right
                 keydownArrow(event, 7);
+                markNotes();
                 break;
             case 40: // on down
                 keydownArrow(event, 3);
+                markNotes();
                 break;
+
+            case 82: // on "r": unmark everything
+                config.chord.toggle = false;
+                config.scale.toggle = false;
+                markNotes(true)
+                break;
+
+            // chord events
             case 67: // on "c": iterate through possibilities
-                // config.scale.toggle = false;
-                keydownPossibilities(-1);
+                config.chord.toggle = true;
+                keydownChordPossibilities(-1);
+                if (config.scale.toggle) {
+                    keydownScalePossibilities();
+                }
+                markNotes();
                 break;
             case 86: // on "v": iterate through possibilities reverse
-                // config.scale.toggle = false;
-                keydownPossibilities(1);
+                config.chord.toggle = true;
+                keydownChordPossibilities(1);
+                if (config.scale.toggle) {
+                    keydownScalePossibilities();
+                }
+                markNotes();
                 break;
+            case 89: // on "y": reset to root note only
+                config.chord.toggle = true;
+                config.chord.current = 0;
+                keydownChordPossibilities();
+                keydownScalePossibilities();
+                markNotes()
+                break;
+            case 88: // on "x": toggle chord on/off
+                config.chord.toggle = !config.chord.toggle;
+                markNotes()
+                break;
+
+            // scale events
             case 68: // on "d": iterate through scales (lydian -> locrian, bright -> dark)
                 config.scale.toggle = true;
-                keydownPossibilities(-1, "scale");
+                keydownScalePossibilities(-1);
+                markNotes();
                 break;
             case 70: // on "f": iterate through scales reverse
                 config.scale.toggle = true;
-                keydownPossibilities(1, "scale");
+                keydownScalePossibilities(1);
+                markNotes();
                 break;
-            case 83: // on "s": toggle everything on/scale off
-                keydownPossibilities(0, "scale");
+            case 83: // on "s": toggle scale on/off
                 config.scale.toggle = !config.scale.toggle;
-                markNotes(true)
+                markNotes();
                 break;
-            case 88: // on "x": toggle everything off/isChord on
-                config.chord.toggle = !config.chord.toggle;
-                config.scale.toggle = false;
-                markNotes()
-                break;
+
             default:
                 return;
         }
@@ -70,7 +102,6 @@ function keydownEnter(event) {
     } else {
         recenterTonnetzByPatternIndex(root);
     }
-    markNotes(true);
 }
 
 function keydownArrow(event, halfsteps) {
@@ -96,18 +127,30 @@ function keydownArrow(event, halfsteps) {
         }
         updateNoteIndices();
     }
-    markNotes(true);
 }
 
-function keydownPossibilities(value, which = "chord") {
-    const isChord = which == "chord"
-    isChord ? updateChordPossibilites() : updateScalePossibilites();
-    const o = isChord ? config.chord : config.scale;
-    if (o.possibilities.length > 0) {
-        o.currentPossibility = mod((o.currentPossibility + value), o.possibilities.length);
-        o.current = o.possibilities[o.currentPossibility];
+function keydownChordPossibilities(value = 0, reset = false) {
+    const {
+        possibilities, currentPossibility, updateFunction
+    } = config.chord;
+
+    updateFunction();
+    if (possibilities.length > 0) {
+        config.chord.currentPossibility = reset ? 0 : mod((currentPossibility + value), possibilities.length);
+        config.chord.current = possibilities[config.chord.currentPossibility];
     }
-    markNotes(true);
+}
+
+function keydownScalePossibilities(value = 0, reset = false) {
+    const {
+        possibilities, currentPossibility, updateFunction
+    } = config.scale;
+
+    updateFunction();
+    if (possibilities.length > 0) {
+        config.scale.currentPossibility = reset ? 0 : mod((currentPossibility + value), possibilities.length);
+        config.scale.current = possibilities[config.scale.currentPossibility];
+    }
 }
 
 export { initEvents };

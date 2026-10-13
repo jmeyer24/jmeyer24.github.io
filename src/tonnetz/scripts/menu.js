@@ -24,7 +24,7 @@ function initMenu() {
         .css('top', `${center.y - offset.y}px`)
         .append(`<div class="menuNote">${names[indices[root]]}</div>`)
         .click(() => {
-            markNotes(root)
+            markNotes()
         });
 
     // Object.entries(config.chord.options).forEach(([key, value]) => {

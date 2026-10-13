@@ -32,55 +32,16 @@ const config = {
     },
 
     chord: {
-        options: { // TODO: use symbols
-            "root": [0],
-            "5": [0, 7],
-            "o": [0, 3, 6],
-            "-": [0, 3, 7],
-            "": [0, 4, 7],
-            "+": [0, 4, 8],
-            "sus4": [0, 5, 7],
-            "sus2": [0, 2, 7],
-            "o7": [0, 3, 6, 10],
-            "o/": [0, 3, 6, 9],
-            "o/maj7": [0, 3, 6, 11],
-            "-, add6": [0, 3, 7, 9],
-            "-7": [0, 3, 7, 10],
-            "&#8209, maj7": [0, 3, 7, 11],
-            "add6": [0, 4, 7, 9],
-            "7": [0, 4, 7, 10],
-            "maj7": [0, 4, 7, 11],
-            "+, add6": [0, 4, 8, 9],
-            "+7": [0, 4, 8, 10],
-            "+maj7": [0, 4, 8, 11],
-            "o(b9)": [0, 3, 6, 10, 13],
-            "o9": [0, 3, 6, 10, 14],
-            "omaj7,b9": [0, 3, 6, 11, 13],
-            "omaj7,9": [0, 3, 6, 11, 14],
-            "-(6,b9)": [0, 3, 7, 9, 13],
-            "-(6,9)": [0, 3, 7, 9, 14],
-            "o/(b9)": [0, 3, 6, 9, 13],
-            "o/9": [0, 3, 6, 9, 14],
-            "&#8209, 7(b9)": [0, 3, 7, 10, 13],
-            "-9": [0, 3, 7, 10, 14],
-            "-maj7,b9": [0, 3, 7, 11, 13],
-            "-maj7,9": [0, 3, 7, 11, 14],
-            "6,b9": [0, 4, 7, 9, 13],
-            "6,9": [0, 4, 7, 9, 14],
-            "7(b9)": [0, 4, 7, 10, 13],
-            "9": [0, 4, 7, 10, 14],
-            "maj7(b9)": [0, 4, 7, 11, 13],
-            "maj9": [0, 4, 7, 11, 14],
-            "+maj7(b9)": [0, 4, 8, 11, 13],
-            "+maj9": [0, 4, 8, 11, 14],
-        },
-        names: ["root", "5", "o", "-", "maj", "+", "sus4", "sus2", "o/", "o7", "o/maj7", "-, add6", "-7", "&#8209, maj7", "add6", "7", "maj7", "+, add6", "+7", "+maj7", "o/(b9)", "o/9", "o(b9)", "o9", "omaj7,b9", "omaj7,9", "-(6,b9)", "-(6,9)", "&#8209, 7(b9)", "-9", "-maj7,b9", "-maj7,9", "6,b9", "6,9", "7(b9)", "9", "maj7(b9)", "maj9", "+maj7(b9)", "+maj9"],
+        options: {}, // TODO: use symbols
+        names: [],
         possibilities: [],
         current: 0,
         currentPossibility: 0,
         toggle: true,
 
         halfstepMap: null,
+
+        updateFunction: null,
     },
 
     scale: {
@@ -105,6 +66,8 @@ const config = {
         toggle: false,
 
         halfstepMap: null,
+
+        updateFunction: null,
     },
 
     color: {
@@ -115,8 +78,10 @@ const config = {
 }
 
 function buildChordOptions() {
-    let options = []
+    config.chord.names = ["root", "b3", "3", "o", "-", "-#5", "maj(b5)", "maj", "+", "o/", "o7", "omaj7", "-add6", "-7", "&#8209 maj7", "-(#5,6)", "o#5", "-#5maj7", "o/maj3", "add6", "7", "maj7", "+,add6", "+7", "+maj7", "o/(b9)", "o/9", "o(b9)", "o9", "omaj7,b9", "omaj7,9", "-(6,b9)", "-(6,9)", "&#8209 7(b9)", "-9", "-maj7,b9", "-maj7,9", "6,b9", "6,9", "7(b9)", "9", "maj7(b9)", "maj9", "+maj7(b9)", "+maj9"];
+    // missing: 5,sus2,sus4
 
+    let options = []
     for (const j of [null, 3, 4]) {
         if (isNull(j)) {
             options.push([0])
@@ -174,6 +139,45 @@ function updateConfig() {
     // config.chord.options = buildChordOptions(config.chord.names)
     buildChordOptions()
 }
+
+function updateChordPossibilites() {
+    const {
+        note: { destination, destinationIndices },
+        chord: { options, possibilities },
+    } = config;
+
+    possibilities.length = 0; // leert das config array
+    Object.entries(options).forEach(([_, option], index) => {
+        let hsFromRoot = destinationIndices[destination];
+        if (option.includes(hsFromRoot)) {
+            possibilities.push(index);
+        }
+    });
+}
+
+function updateScalePossibilites() {
+    /*
+    check which scale is a possibility for the current chord
+    */
+    const {
+        chord: { options: options_c, names, current },
+        scale: { options: options_s, possibilities },
+    } = config;
+
+    const chord = options_c[names[current]];
+
+    possibilities.length = 0; // leert das config array
+    Object.entries(options_s).forEach(([_, option], index) => {
+        if (chord.every(element => option.includes(element))) {
+            possibilities.push(index);
+        }
+    });
+}
+
 updateConfig();
+updateChordPossibilites();
+updateScalePossibilites();
+config.chord.updateFunction = updateChordPossibilites;
+config.scale.updateFunction = updateScalePossibilites;
 
 export { config, updateConfig };

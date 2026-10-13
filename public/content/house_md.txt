@@ -1,17 +1,18 @@
-EKG
-Echocardiography
-Tachycardia
-Hypokalemia
-CT Scan
-Lumbar Puncture
-Magnetic Resonance Tomography
-Magnetic Resonance Angiography
-Positron Emission Tomography
-Polymerase Chain Reaction
-Electromyography
-Plasmapheresis
-Botulism
-Cardiac Arrest
-Erdheim-Chester Disease
-Tuberous Sclerosis Complex
+Primary Amoebic Meningoencephalitis
 Herpes Encephalitis
+Tuberous Sclerosis Complex
+Erdheim-Chester Disease
+Cardiac Arrest
+Botulism
+Plasmapheresis
+Electromyography
+Polymerase Chain Reaction
+Positron Emission Tomography
+Magnetic Resonance Angiography
+Magnetic Resonance Tomography
+Lumbar Puncture
+CT Scan
+Hypokalemia
+Tachycardia
+Echocardiography
+EKG
