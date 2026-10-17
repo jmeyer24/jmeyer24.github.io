@@ -3,10 +3,11 @@
 </div>
 
 <script type="module">
-    var projects = {
+    const projects = {
         tonnetz: "Euler's Tonnetz",
-        superAwesomeFractalExplorer: "Fractal Explorer",
+        SAFE: "Fractal Explorer",
         malazanKnowledgeGraph: "Malazan Graph",
+        timeline: "Timeline",
     };
 
     // fill the projects div with imaged links
@@ -16,7 +17,7 @@
         $("#project-list").append(
             `
             <div class="w-full max-w-xs mx-auto">
-                <a href="/#projects#${key}" class="relative">
+                <a href="/#project#${key}" class="relative">
                     <img 
                         src="${imgUrl}" 
                         class="rounded-image object-cover object-top-left" 
@@ -29,4 +30,6 @@
             `
         );
     });
+
+    export default projects;
 </script>

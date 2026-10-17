@@ -1,3 +1,5 @@
+import projects from "/pages/projects.html?url";
+
 // load the navigation bar and the footer bar
 $("footer").load("/structure/footer.html")
 await fetch("/structure/nav.html")
@@ -14,10 +16,17 @@ function writeContent() {
     }
     // get the page name/path
     let current_page = window.location.hash.split("#").filter(Boolean);
-    let nav_current_page = current_page.slice(-1)[0];
-    current_page = current_page.join("/");
+    let nav_current_page = "";
+    if (current_page.includes("project")) {
+        const project = window.location.hash.split("#").slice(-1)[0];
+        nav_current_page = projects[project];
+        current_page = "project";
+    } else {
+        nav_current_page = current_page.slice(-1)[0];
+        current_page = current_page.join("/");
+    }
     // write the content in the main element
-    $("main").load(`/pages/${current_page}.html`, function (response, status, xhr) {
+    $("main").load(`/pages/${current_page}.html`, function (_, status, xhr) {
         if (status == "error") {
             console.warn(`"${current_page}.html" could not be loaded properly. HTTP-status: ${xhr.status}`);
             $("main").load("/structure/404.html");
@@ -27,9 +36,9 @@ function writeContent() {
     $("nav #current-site").html(nav_current_page);
 }
 
+// update content when hash changes
+// e.g. due to document load or nav link clicks
 $(document).ready(writeContent);
-
-// when the hash changes (due to nav link clicks), update the main content
 $(window).on("hashchange", writeContent);
 
 // TODO: on menu-button, toggle menu
@@ -50,3 +59,5 @@ $(document).on("keydown", function (event) {
             break;
     }
 });
+
+export default projects;

@@ -1,0 +1,13 @@
+<iframe id="my-iframe" tabindex="-1" frameBorder="0" class="w-full h-full"></iframe>
+
+<script>
+    {
+        const project = window.location.hash.split("#").slice(-1)[0];
+        const project_url = `/projects/${project}/index.html`;
+        $("#my-iframe")
+            .attr("src", project_url)
+            .on("load", function () {
+                $(this).focus();
+            }).trigger("load");
+    }
+</script>
