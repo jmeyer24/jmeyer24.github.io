@@ -7,6 +7,7 @@ export default defineConfig({
   plugins: [
     tailwindcss(),
   ],
+  // Access points for main and projects
   build: {
     rollupOptions: {
       input: {
@@ -16,9 +17,12 @@ export default defineConfig({
       }
     }
   },
+  // Creates an Alias
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
     }
-  }
+  },
+  // No SPA-Fallback für unresolved paths (-> 404 error like on github pages)
+  appType: 'mpa',
 })
