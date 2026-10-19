@@ -1,4 +1,4 @@
-import projects from "/src/projects.js";
+import projects from "@/projects.js";
 
 // load the navigation bar and the footer bar
 $("footer").load("/structure/footer.html")
