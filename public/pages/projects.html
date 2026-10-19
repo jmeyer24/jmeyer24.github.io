@@ -1,29 +1,3 @@
 <div class="content-wrapper">
     <div id="project-list" class="grid! grid-cols-3 gap-8"></div>
 </div>
-
-<script type="module">
-    import projects from "@/projects.js";
-
-    // fill the projects div with imaged links
-    Object.entries(projects).forEach(([key, value]) => {
-        const imgUrl = new URL(`/images/${key}.jpg`, import.meta.url).href;
-
-        $("#project-list").append(
-            `
-            <div class="w-full max-w-xs mx-auto">
-                <a href="/#project#${key}" class="relative">
-                    <img 
-                        src="${imgUrl}" 
-                        onerror="this.onerror=null; this.src='/images/ball_800x800.png';" 
-                        class="rounded-image object-cover object-top-left" 
-                    />
-                    <div class="absolute size-full top-1/2 left-1/2 -translate-1/2 rounded-(--border-radius) flex items-center justify-center text-center text-shadow-[-1px_1px_2px_var(--color-high),1px_1px_1px_var(--color-bg)] bg-(--color-high) opacity-0 duration-(--transition-time) ease-in-out hover:opacity-90">
-                        ${value}
-                    </div>
-                </a>
-            </div>
-            `
-        );
-    });
-</script>
