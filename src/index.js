@@ -27,6 +27,7 @@ function writeContent() {
     }
     // write the content in the main element
     $("main").load(`/pages/${current_page}.html`, function (_, status, xhr) {
+        $("body")[current_page == "welcome" ? "addClass" : "removeClass"]("show-footer");
         if (status == "error") {
             console.warn(`"${current_page}.html" could not be loaded properly. HTTP-status: ${xhr.status}`);
             $("main").load("/structure/404.html");
