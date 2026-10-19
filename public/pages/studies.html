@@ -1,4 +1,4 @@
-<div id="wiki-topics" class="content-wrapper grid! md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+<div id="wiki-topics" class="content-wrapper flex! flex-col gap-0"></div>
 
 <script>
     function fetchListOfWikipediaTopics(list_file) {
@@ -10,9 +10,9 @@
                 if (trimmedTopic !== "") {
                     const uniqueId = `topic-${i}`;
                     const topicHtml = `
-                        <div id="${uniqueId}" class="topic-container h-full">
-                            <h2 class="topic-title"></h2>
-                            <p class="topic-extract">Load ${trimmedTopic}...</p>
+                        <div id="${uniqueId}" class="topic-container flex gap-1 w-full select-none hover:bg-(--color-high)/(--color-muting-factor)">
+                            <h2 class="topic-title flex-shrink-0 w-1/6">${trimmedTopic}</h2>
+                            <p class="topic-extract text-xs"></p>
                         </div>
                     `;
                     $('#wiki-topics').append(topicHtml);
@@ -22,24 +22,26 @@
                     // Modern Wikipedia REST API endpoint (Supports Native CORS required by jQuery 4)
                     const apiUrl = `https://en.wikipedia.org/api/rest_v1/page/summary/${encodedTopic}`;
 
-                    $.ajax({
-                        url: apiUrl,
-                        method: "GET",
-                        headers: {
-                            // Wikipedia strictly requests a custom User-Agent header for tracking API use
-                            'Api-User-Agent': 'jmeyer24.github.io/1.0 (jakobmeyer.feu@gmail.com)'
-                        },
-                        dataType: "json",
-                        success: function (data) {
-                            $(`#${uniqueId} .topic-title`).html(`<a href="https://en.wikipedia.org/wiki/${data.title}">${data.title}</a>`);
-                            $(`#${uniqueId} .topic-extract`).text(data.extract || "No summary available.");
+                    $(`#${uniqueId}`).on("click", function () {
+                        $.ajax({
+                            url: apiUrl,
+                            method: "GET",
+                            headers: {
+                                // Wikipedia strictly requests a custom User-Agent header for tracking API use
+                                'Api-User-Agent': 'jmeyer24.github.io/1.0 (jakobmeyer.feu@gmail.com)'
+                            },
+                            dataType: "json",
+                            success: function (data) {
+                                $(`#${uniqueId} .topic-title`).html(`<a href="https://en.wikipedia.org/wiki/${data.title}">${data.title}</a>`);
+                                $(`#${uniqueId} .topic-extract`).text(data.extract || "No summary available.");
 
-                        },
-                        error: function (err) {
-                            console.error(`Error fetching data for ${trimmedTopic}`, err);
-                            $(`#${uniqueId} .topic-extract`).text(`Error loading: ${trimmedTopic}`);
-                        }
-                    });
+                            },
+                            error: function (err) {
+                                console.error(`Error fetching data for ${trimmedTopic}`, err);
+                                $(`#${uniqueId} .topic-extract`).text(`Error loading: ${trimmedTopic}`);
+                            }
+                        });
+                    })
                 }
             });
         });
