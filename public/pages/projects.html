@@ -3,12 +3,7 @@
 </div>
 
 <script type="module">
-    const projects = {
-        tonnetz: "Euler's Tonnetz",
-        SAFE: "Fractal Explorer",
-        malazanKnowledgeGraph: "Malazan Graph",
-        timeline: "Timeline",
-    };
+    import projects from "/src/projects.js";
 
     // fill the projects div with imaged links
     Object.entries(projects).forEach(([key, value]) => {
@@ -31,6 +26,4 @@
             `
         );
     });
-
-    export default projects;
 </script>

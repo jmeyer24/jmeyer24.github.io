@@ -1,4 +1,4 @@
-import projects from "/pages/projects.html?url";
+import projects from "/src/projects.js";
 
 // load the navigation bar and the footer bar
 $("footer").load("/structure/footer.html")
@@ -60,5 +60,3 @@ $(document).on("keydown", function (event) {
             break;
     }
 });
-
-export default projects;
