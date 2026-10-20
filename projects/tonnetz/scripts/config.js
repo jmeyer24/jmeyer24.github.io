@@ -5,7 +5,6 @@ const config = {
         segments: 8,
         indices: [],
         vertices: [],
-        normals: [],
 
         scaling: null,
 

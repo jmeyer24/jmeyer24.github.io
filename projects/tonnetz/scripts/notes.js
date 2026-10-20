@@ -1,11 +1,14 @@
 import { config } from "./config";
 import { mod, drawPianoKeys } from "./utilities";
 
-$("body").append(`<div id="noteBin"></div>`);
+function initNotes() {
+    $("body").append(`<div id="noteBin"></div>`);
+}
 
 function drawNotes() {
+    // TODO: instead of redrawing, just change the htmls of the already drawn notes
     const {
-        display: { notesPerRow, vertices },
+        display: { notesPerRow, scaling, vertices },
         note: { indices, names }
     } = config;
 
@@ -18,8 +21,8 @@ function drawNotes() {
     // create the notes on the tonnetz
     for (let i = 0; i < (notesPerRow) ** 2; i++) {
         const offset = {
-            x: vertices[i * 3],
-            y: vertices[i * 3 + 1]
+            x: vertices[i * 3] * scaling,
+            y: vertices[i * 3 + 1] * scaling,
         };
 
         // add a note to the noteBin
@@ -61,8 +64,6 @@ function drawNotes() {
 function updateNoteIndices() {
     /*
     apply the current note offset to the noteIndices
-
-    return: null (implicit change in config)
     */
     const { indices, defaultIndices, offset, names, root } = config.note;
 
@@ -72,7 +73,6 @@ function updateNoteIndices() {
 
 function updateNotes() {
     updateNoteIndices();
-    // TODO: instead of redrawing, just change the htmls of the already drawn notes
     drawNotes();
 }
 
@@ -159,6 +159,7 @@ function markNotes(unmarkOnly = false) {
         });
     }
 }
+
 function scrollThroughChords(event) {
     const { current, options } = config.chord;
 
@@ -171,4 +172,8 @@ function scrollThroughChords(event) {
     markNotes();
 }
 
-export { markNotes, drawNotes, scrollThroughChords, updateNoteIndices, updateNotes, recenterTonnetzByPatternIndex };
+function scaleNotes() {
+
+}
+
+export { initNotes, markNotes, drawNotes, scrollThroughChords, updateNoteIndices, updateNotes, recenterTonnetzByPatternIndex };

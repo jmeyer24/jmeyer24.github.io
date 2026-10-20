@@ -1,8 +1,6 @@
-import { initScene, resize, animate } from "./scripts/scene";
-import { initTonnetz, updateTonnetz } from "./scripts/tonnetz";
-
-import { updateNotes, drawNotes, markNotes } from "./scripts/notes";
-
+import { initScene, resizeScene, animate } from "./scripts/scene";
+import { initTonnetz, drawTonnetz, scaleTonnetz } from "./scripts/tonnetz";
+import { initNotes, updateNotes, drawNotes, markNotes } from "./scripts/notes";
 import { initGui } from "./scripts/gui";
 import { initMenu } from "./scripts/menu";
 import { initEvents } from "./scripts/events";
@@ -28,8 +26,8 @@ import { initEvents } from "./scripts/events";
 // +CTRL: instead move destination note to root
 
 function update() {
-  resize();
-  updateTonnetz();
+  resizeScene();
+  scaleTonnetz();
   updateNotes();
   drawNotes();
   markNotes();
@@ -38,13 +36,14 @@ function update() {
 function init() {
   initScene();
   initTonnetz();
+  drawTonnetz();
+  initNotes();
   initGui();
   // initMenu();
   initEvents();
 }
 
-$(window).on("resize", update);
-
 init();
 update();
 animate();
+$(window).on("resize", update);

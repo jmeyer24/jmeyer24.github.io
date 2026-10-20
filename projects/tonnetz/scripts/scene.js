@@ -6,7 +6,7 @@ let scene, camera, renderer;
 
 function initScene() {
     scene = new THREE.Scene();
-    scene.background = new THREE.Color(config.color.background);
+    scene.background = new THREE.Color(config.color.minor);
 
     camera = new THREE.PerspectiveCamera();
     camera.aspect = window.innerWidth / window.innerHeight;
@@ -19,7 +19,7 @@ function initScene() {
     $("body").append(renderer.domElement);
 }
 
-function resize() {
+function resizeScene() {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
 
@@ -31,4 +31,4 @@ function animate() {
     renderer.render(scene, camera);
 }
 
-export { initScene, resize, animate, camera };
+export { initScene, resizeScene, animate, camera };
