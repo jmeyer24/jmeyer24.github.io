@@ -6,7 +6,7 @@ function initEvents() {
     // on event callback functions
     $(window).on('wheel', scrollThroughChords);
     $(window).keydown(function (event) {
-        console.log(event.which);
+        // console.log(event.which);
         switch (event.which) {
             case 13: // enter: recenter on root note
                 keydownEnter(event);

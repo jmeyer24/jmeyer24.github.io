@@ -7,8 +7,7 @@ const config = {
         vertices: [],
         normals: [],
 
-        scaling: 30,
-        unknownScaling: 28.75, // TODO: why is that?
+        scaling: null,
 
         togglePianoKeys: false,
         pianoKeys: [1, 3, 6, 8, 10], // the black keys on the piano

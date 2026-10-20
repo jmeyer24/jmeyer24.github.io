@@ -2,7 +2,7 @@ import dat from "dat.gui";
 
 import { config, updateConfig } from "./config";
 import { updateNotes } from "./notes";
-import { updateTonnetz } from "./scene";
+import { updateTonnetz } from "./tonnetz";
 
 function initGui() {
     const gui = new dat.gui.GUI();

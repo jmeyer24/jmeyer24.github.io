@@ -2,7 +2,6 @@ import { config } from "./config";
 import { mod, drawPianoKeys } from "./utilities";
 
 $("body").append(`<div id="noteBin"></div>`);
-const scaling = config.display.scaling * config.display.unknownScaling;
 
 function drawNotes() {
     const {
@@ -19,8 +18,8 @@ function drawNotes() {
     // create the notes on the tonnetz
     for (let i = 0; i < (notesPerRow) ** 2; i++) {
         const offset = {
-            x: scaling * vertices[i * 3],
-            y: scaling * vertices[i * 3 + 1]
+            x: vertices[i * 3],
+            y: vertices[i * 3 + 1]
         };
 
         // add a note to the noteBin

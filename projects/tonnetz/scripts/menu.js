@@ -5,7 +5,7 @@ $("body").append(`<div id="menu"></div>`);
 
 function initMenu() {
     const {
-        display: { scaling, unknownScaling, vertices },
+        display: { vertices },
         note: { root, names, indices },
     } = config;
 
@@ -13,10 +13,9 @@ function initMenu() {
         x: window.innerWidth / 2,
         y: window.innerHeight / 2
     };
-    const totalScaling = scaling * unknownScaling;
     const offset = {
-        x: totalScaling * vertices[root * 3],
-        y: totalScaling * vertices[root * 3 + 1]
+        x: vertices[root * 3],
+        y: vertices[root * 3 + 1]
     };
     $("#menu")
         .empty()

@@ -1,6 +1,7 @@
-import { setup, resize, animate } from "./scripts/scene";
+import { initScene, resize, animate } from "./scripts/scene";
+import { initTonnetz, updateTonnetz } from "./scripts/tonnetz";
 
-import { drawNotes, markNotes } from "./scripts/notes";
+import { updateNotes, drawNotes, markNotes } from "./scripts/notes";
 
 import { initGui } from "./scripts/gui";
 import { initMenu } from "./scripts/menu";
@@ -28,17 +29,22 @@ import { initEvents } from "./scripts/events";
 
 function update() {
   resize();
+  updateTonnetz();
+  updateNotes();
   drawNotes();
   markNotes();
 }
 
-setup();
-update();
+function init() {
+  initScene();
+  initTonnetz();
+  initGui();
+  // initMenu();
+  initEvents();
+}
 
-initGui();
-// initMenu();
-
-initEvents();
 $(window).on("resize", update);
 
+init();
+update();
 animate();
