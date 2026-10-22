@@ -1,5 +1,5 @@
 import { config } from "./config";
-import { mod, drawPianoKeys } from "./utilities";
+import { mod, drawPianoKeys, computeScalingFromHeight } from "./utilities";
 
 function initNotes() {
     $("body").append(`<div id="noteBin"></div>`);
@@ -8,7 +8,7 @@ function initNotes() {
 function drawNotes() {
     // TODO: instead of redrawing, just change the htmls of the already drawn notes
     const {
-        display: { notesPerRow, scaling, vertices },
+        display: { notesPerRow, vertices, width, height },
         note: { indices, names }
     } = config;
 
@@ -18,13 +18,13 @@ function drawNotes() {
         y: window.innerHeight / 2
     };
 
-    // create the notes on the tonnetz
+    // create notes on the tonnetz
+    const scaling = computeScalingFromHeight(window.innerHeight);
     for (let i = 0; i < (notesPerRow) ** 2; i++) {
         const offset = {
             x: vertices[i * 3] * scaling,
             y: vertices[i * 3 + 1] * scaling,
         };
-
         // add a note to the noteBin
         const noteDiv = `
             <div class="note w-0 h-0"

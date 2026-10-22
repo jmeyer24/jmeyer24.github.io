@@ -2,13 +2,9 @@ import * as THREE from "three";
 
 import { config } from "./config";
 import { camera } from "./scene";
-import { getVisibleHeight } from "./utilities";
+import { getVisibleHeight, computeScalingFromHeight } from "./utilities";
 
 let tonnetz, mesh;
-
-// consider a parallelogram of equilateral triangles
-const tonnetzHeight = Math.sqrt(0.75);
-const tonnetzWidth = 1.5;
 
 function initTonnetz() {
     tonnetz = new THREE.Group();
@@ -29,7 +25,7 @@ function clearTonnetz() {
 
 function drawTonnetz() {
     const {
-        display: { vertices, indices, segments, notesPerRow },
+        display: { vertices, indices, segments, notesPerRow, height },
         note: { defaultIndices, names }
     } = config;
 
@@ -39,7 +35,7 @@ function drawTonnetz() {
 
     // compute vertices for a parallelogram of even-sided triangles
     for (let i = 0; i <= segments; i++) {
-        const y = (i / segments - 0.5) * tonnetzHeight;
+        const y = (i / segments - 0.5) * height;
 
         for (let j = 0; j <= segments; j++) {
             const x = ((j - i / 2) / segments - 0.25);
@@ -89,10 +85,8 @@ function drawTonnetz() {
 }
 
 function scaleTonnetz() {
-    // height that is visible with a given field of view (fov)
-    const visibleHeight = getVisibleHeight(camera.fov);
-    config.display.scaling = Math.min(visibleHeight / tonnetzHeight, visibleHeight * camera.aspect / tonnetzWidth);
-    mesh.scale.set(config.display.scaling, config.display.scaling, 1);
+    const scaling = computeScalingFromHeight(getVisibleHeight(camera.fov));
+    mesh.scale.set(scaling, scaling, 1);
 }
 
 function redrawTonnetz() {

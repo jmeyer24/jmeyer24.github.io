@@ -6,7 +6,13 @@ const config = {
         indices: [],
         vertices: [],
 
-        scaling: null,
+        // consider a parallelogram of equilateral triangles
+        width: 1.5,
+        height: Math.sqrt(0.75),
+        aspect: null,
+
+        // in percentage of the window.innerWidth/Height
+        padding: 0.11,
 
         togglePianoKeys: false,
         pianoKeys: [1, 3, 6, 8, 10], // the black keys on the piano
@@ -117,6 +123,7 @@ function updateConfig() {
     const n = config.display.segments + 1;
 
     config.display.notesPerRow = n;
+    config.display.aspect = config.display.width / config.display.height;
 
     config.note.center = Math.floor(n ** 2 / 2);
     config.note.root = config.note.center;

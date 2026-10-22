@@ -29,7 +29,6 @@ function update() {
   resizeScene();
   scaleTonnetz();
   updateNotes();
-  drawNotes();
   markNotes();
 }
 
