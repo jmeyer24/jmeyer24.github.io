@@ -25,8 +25,7 @@ function clearTonnetz() {
 
 function drawTonnetz() {
     const {
-        display: { vertices, indices, segments, notesPerRow, height },
-        note: { defaultIndices, names }
+        display: { vertices, indices, notesPerRow, height }
     } = config;
 
     // as they are list references, they get cleared to empty lists
@@ -34,6 +33,7 @@ function drawTonnetz() {
     indices.length = 0;
 
     // compute vertices for a parallelogram of even-sided triangles
+    const segments = notesPerRow - 1;
     for (let i = 0; i <= segments; i++) {
         const y = (i / segments - 0.5) * height;
 
@@ -53,21 +53,6 @@ function drawTonnetz() {
 
             indices.push(a, b, c);
         }
-    }
-
-    // compute nodeIndices, e.g. which circle represents which note
-    defaultIndices.length = 0;
-    defaultIndices.push(0);
-    for (let i = 1; i < (notesPerRow) ** 2; i++) {
-        defaultIndices.push(
-            // when we are at a new row in the tonnetz
-            // compute the new start of the row
-            // else go to the fifth (7 halfsteps)
-            (!(i % (notesPerRow))
-                ? (i / (notesPerRow)) * 8
-                : defaultIndices[i - 1] + 7)
-            % names.length
-        );
     }
 
     // draw the tonnetz

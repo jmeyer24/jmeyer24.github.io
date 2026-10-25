@@ -1,7 +1,7 @@
+import { config } from "./scripts/config";
 import { initScene, resizeScene, animate } from "./scripts/scene";
 import { initTonnetz, drawTonnetz, scaleTonnetz } from "./scripts/tonnetz";
-import { initNotes, updateNotes, drawNotes, markNotes } from "./scripts/notes";
-import { initGui } from "./scripts/gui";
+import { initNotes, positionNotes, updateNotes } from "./scripts/notes";
 import { initMenu } from "./scripts/menu";
 import { initEvents } from "./scripts/events";
 
@@ -25,21 +25,21 @@ import { initEvents } from "./scripts/events";
 // +SHIFT: instead center on the destination note
 // +CTRL: instead move destination note to root
 
-function update() {
-  resizeScene();
-  scaleTonnetz();
-  updateNotes();
-  markNotes();
-}
-
 function init() {
   initScene();
   initTonnetz();
   drawTonnetz();
   initNotes();
-  initGui();
+  config.applyNoteOffset();
+  updateNotes();
   // initMenu();
   initEvents();
+}
+
+function update() {
+  resizeScene();
+  scaleTonnetz();
+  positionNotes();
 }
 
 init();

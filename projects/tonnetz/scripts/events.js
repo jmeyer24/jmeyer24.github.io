@@ -1,156 +1,182 @@
 import { config } from "./config";
+import { redrawTonnetz } from "./tonnetz";
 import { mod } from "./utilities";
-import { markNotes, scrollThroughChords, updateNoteIndices, updateNotes, recenterTonnetzByPatternIndex, drawNotes } from "./notes";
-
-function initEvents() {
-    // on event callback functions
-    $(window).on('wheel', scrollThroughChords);
-    $(window).keydown(function (event) {
-        // console.log(event.which);
-        switch (event.which) {
-            case 13: // enter: recenter on root note
-                keydownEnter(event);
-                break;
-            case 32: // spacebar: toggle pianoKeys
-                config.display.togglePianoKeys = !config.display.togglePianoKeys;
-                drawNotes();
-                markNotes();
-                break;
-
-            // movement
-            case 37: // on left
-                keydownArrow(event, 5)
-                markNotes();
-                break;
-            case 38: // on up
-                keydownArrow(event, 9)
-                markNotes();
-                break;
-            case 39: // on right
-                keydownArrow(event, 7);
-                markNotes();
-                break;
-            case 40: // on down
-                keydownArrow(event, 3);
-                markNotes();
-                break;
-
-            case 82: // on "r": unmark everything
-                config.chord.toggle = false;
-                config.scale.toggle = false;
-                markNotes(true)
-                break;
-
-            // chord events
-            case 67: // on "c": iterate through possibilities
-                config.chord.toggle = true;
-                keydownChordPossibilities(-1);
-                if (config.scale.toggle) {
-                    keydownScalePossibilities();
-                }
-                markNotes();
-                break;
-            case 86: // on "v": iterate through possibilities reverse
-                config.chord.toggle = true;
-                keydownChordPossibilities(1);
-                if (config.scale.toggle) {
-                    keydownScalePossibilities();
-                }
-                markNotes();
-                break;
-            case 89: // on "y": reset to root note only
-                config.chord.toggle = true;
-                config.chord.current = 0;
-                keydownChordPossibilities();
-                keydownScalePossibilities();
-                markNotes()
-                break;
-            case 88: // on "x": toggle chord on/off
-                config.chord.toggle = !config.chord.toggle;
-                markNotes()
-                break;
-
-            // scale events
-            case 68: // on "d": iterate through scales (lydian -> locrian, bright -> dark)
-                config.scale.toggle = true;
-                keydownScalePossibilities(-1);
-                markNotes();
-                break;
-            case 70: // on "f": iterate through scales reverse
-                config.scale.toggle = true;
-                keydownScalePossibilities(1);
-                markNotes();
-                break;
-            case 83: // on "s": toggle scale on/off
-                config.scale.toggle = !config.scale.toggle;
-                markNotes();
-                break;
-
-            default:
-                return;
-        }
-    });
-}
+import { initNotes, updateNotes, recenterTonnetzByNoteIndex } from "./notes";
 
 function keydownEnter(event) {
     const { destination, root } = config.note;
 
     if (event.shiftKey) {
-        recenterTonnetzByPatternIndex(destination);
+        recenterTonnetzByNoteIndex(destination);
     } else if (event.ctrlKey) {
         config.note.destination = root;
     } else {
-        recenterTonnetzByPatternIndex(root);
+        recenterTonnetzByNoteIndex(root);
     }
 }
 
 function keydownArrow(event, halfsteps) {
     const {
-        display: { halfstepMap, notesPerRow },
-        note: { destination, root, indices, center }
+        display: { halfstepMovement, notesPerRow },
+        note: { chromaticSteps, destination, root, indices },
     } = config;
 
     if (event.shiftKey) {
         // mark destination note, then ctrl key event
         $("#noteBin div").eq(destination).removeClass("marked destination");
-        config.note.destination = mod(destination + halfstepMap[halfsteps], indices.length);
+        config.note.destination = mod(destination + halfstepMovement[halfsteps], indices.length);
         $("#noteBin div").eq(config.note.destination).addClass("marked destination");
-        updateNoteIndices();
     } else if (event.ctrlKey) {
-        config.note.offset = indices[center] + halfsteps;
-        updateNotes();
+        config.note.offset = mod(config.note.offset + halfsteps, chromaticSteps);
+        config.applyNoteOffset();
     } else {
-        const save = destination == root
-        config.note.root = mod(root + halfstepMap[halfsteps], notesPerRow ** 2);
-        if (save) {
+        config.note.root = mod(root + halfstepMovement[halfsteps], notesPerRow ** 2);
+        if (destination == root) { // root is the old value!
             config.note.destination = config.note.root;
         }
-        updateNoteIndices();
     }
+
+    // on movement show the chord
+    config.chord.toggle = true;
 }
 
-function keydownChordPossibilities(value = 0, reset = false) {
+function keydownChordPossibilities(shiftPossibility = 0, reset = false) {
     const {
         possibilities, currentPossibility, updateFunction
     } = config.chord;
 
     updateFunction();
     if (possibilities.length > 0) {
-        config.chord.currentPossibility = reset ? 0 : mod((currentPossibility + value), possibilities.length);
+        config.chord.currentPossibility = reset ? 0 : mod((currentPossibility + shiftPossibility), possibilities.length);
         config.chord.current = possibilities[config.chord.currentPossibility];
     }
 }
 
-function keydownScalePossibilities(value = 0, reset = false) {
+function keydownScalePossibilities(shiftPossibility = 0, reset = false) {
     const {
         possibilities, currentPossibility, updateFunction
     } = config.scale;
 
     updateFunction();
     if (possibilities.length > 0) {
-        config.scale.currentPossibility = reset ? 0 : mod((currentPossibility + value), possibilities.length);
+        config.scale.currentPossibility = reset ? 0 : mod((currentPossibility + shiftPossibility), possibilities.length);
         config.scale.current = possibilities[config.scale.currentPossibility];
     }
 }
+
+function scrollEvent(event) {
+    const {
+        display: { notesPerRow, minNotesPerRow, maxNotesPerRow },
+        note: { chromaticSteps },
+    } = config;
+
+    if (config.display.isScrolling) return;
+
+    function updateTesselation(changeNotesPerRow, changeOffset) {
+        config.display.notesPerRow = config.display.notesPerRow + changeNotesPerRow;
+        config.applyNotesPerRow();
+        redrawTonnetz();
+        config.note.offset = mod(config.note.offset + changeOffset, chromaticSteps);
+        config.applyNoteOffset();
+        initNotes();
+    }
+
+    // deltaY secords vertical scroll, deltaX and deltaZ exist too.
+    // this condition makes sure it's vertical scrolling that changes chords
+    const delta = event.originalEvent.deltaY;
+    if (event.ctrlKey && delta) {
+        // change the tesselation of the tonnetz
+        if (delta > 0 && notesPerRow > minNotesPerRow) {
+            updateTesselation(-2, 3);
+        } else if (delta < 0 && notesPerRow < maxNotesPerRow) {
+            updateTesselation(2, -3);
+        }
+
+        config.display.isScrolling = true;
+        setTimeout(() => {
+            config.display.isScrolling = false;
+        }, config.display.scrollingPause);
+    }
+
+    updateNotes();
+}
+
+function initEvents() {
+    // on event callback functions
+    $(window).on('wheel', { passive: false }, scrollEvent);
+    $(window).keydown(function (event) {
+        // console.log(event.which);
+        switch (event.key) {
+            case "Enter": // recenter on root note
+                keydownEnter(event);
+                break;
+            case " ": // toggle pianoKeys
+                config.display.togglePianoKeys = !config.display.togglePianoKeys;
+                break;
+
+            // movement
+            case "ArrowLeft":
+                keydownArrow(event, 5)
+                break;
+            case "ArrowRight":
+                keydownArrow(event, 7);
+                break;
+            case "ArrowUp":
+                keydownArrow(event, 9)
+                break;
+            case "ArrowDown":
+                keydownArrow(event, 3);
+                break;
+
+            case "r": // unmark everything
+                config.chord.toggle = false;
+                config.scale.toggle = false;
+                config.display.doMarkNotes = false;
+                break;
+
+            // chord events
+            case "c": // iterate through possibilities
+                config.chord.toggle = true;
+                keydownChordPossibilities(-1);
+                if (config.scale.toggle) {
+                    keydownScalePossibilities();
+                }
+                break;
+            case "v": // iterate through possibilities reverse
+                config.chord.toggle = true;
+                keydownChordPossibilities(1);
+                if (config.scale.toggle) {
+                    keydownScalePossibilities();
+                }
+                break;
+            case "x": // toggle chord on/off
+                config.chord.toggle = !config.chord.toggle;
+                break;
+            case "y": // reset to root note only
+                config.chord.toggle = true;
+                config.chord.current = 0;
+                break;
+
+            // scale events
+            case "d": // iterate through scales (lydian -> locrian, bright -> dark)
+                config.scale.toggle = true;
+                keydownScalePossibilities(-1);
+                break;
+            case "f": // iterate through scales reverse
+                config.scale.toggle = true;
+                keydownScalePossibilities(1);
+                break;
+            case "s": // toggle scale on/off
+                config.scale.toggle = !config.scale.toggle;
+                break;
+
+            default:
+                break;
+        }
+
+        updateNotes();
+    });
+}
+
 
 export { initEvents };
