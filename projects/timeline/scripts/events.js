@@ -1,15 +1,15 @@
-import config from "./config";
+import { config } from "./config";
 
-export default function initEvents() {
-    const { gui, guiTimeline, guiCamera } = config.gui;
+function initEvents() {
+    const { gui, guiTimeline, guiCamera, guiAnimation } = config.gui;
 
     $(window).keydown(function (event) {
         switch (event.key.toLowerCase()) {
-            case "o":
+            case "c":
                 gui.open(gui._closed);
                 break;
 
-            case "e":
+            case "t":
                 if (gui._closed) {
                     gui.open();
                     guiTimeline.open();
@@ -17,18 +17,8 @@ export default function initEvents() {
                     guiTimeline.open(guiTimeline._closed);
                 }
                 break;
-            case "m":
-                gui.open()
-                guiTimeline.open();
-                guiTimeline.controllers[0].$input.focus();
-                break;
-            case "s":
-                gui.open();
-                guiTimeline.open();
-                guiTimeline.controllers[1].$input.focus();
-                break;
 
-            case "a":
+            case "f":
                 if (gui._closed) {
                     gui.open();
                     guiCamera.open();
@@ -36,35 +26,35 @@ export default function initEvents() {
                     guiCamera.open(guiCamera._closed);
                 }
                 break;
-            case "f":
+            case "y":
                 gui.open();
                 guiCamera.open();
                 guiCamera.controllers[0].setValue(!config.cameraFocus.flyAlong);
                 break;
+            case "s":
+                gui.open();
+                guiCamera.open();
+                guiCamera.controllers[1].setValue(!config.cameraFocus.focusSun);
+                break;
+
+            case "a":
+                if (gui._closed) {
+                    gui.open();
+                    guiAnimation.open();
+                } else {
+                    guiAnimation.open(guiAnimation._closed);
+                }
+                break;
+            case " ":
+                gui.open();
+                guiAnimation.open();
+                guiAnimation.controllers[0].setValue(!config.animation.runTime);
+                break;
             case "r":
                 gui.open();
-                guiCamera.open();
-                guiCamera.controllers[1].setValue(!config.cameraFocus.fromOutside);
-                break;
-            case "i":
-                gui.open();
-                guiCamera.open();
-                guiCamera.controllers[2].$input.focus();
-                break;
-            case "t":
-                gui.open();
-                guiCamera.open();
-                guiCamera.controllers[3].$input.focus();
-                break;
-            case "y":
-                gui.open();
-                guiCamera.open();
-                guiCamera.controllers[4].$input.focus();
-                break;
-            case "d":
-                gui.open();
-                guiCamera.open();
-                guiCamera.controllers[5].$input.focus();
+                guiAnimation.open();
+                const controller = guiAnimation.controllers[2];
+                controller.object[controller.property]();
                 break;
 
             default:
@@ -72,3 +62,5 @@ export default function initEvents() {
         }
     })
 }
+
+export { initEvents };

@@ -1,78 +1,93 @@
 import { GUI } from "three/addons/libs/lil-gui.module.min.js";
 
-import config from "./config";
-import { updateConfig } from "./config";
-import { updateTimeline, updateCamera } from "./scene";
-import { mod, roundingTo, clamp } from "./utilities";
-import { bool } from "three/tsl";
+import { config, applyDeath, applyTime, applyYearOrDay } from "./config";
+import { updateScene } from "./scene";
+import { updateTimeline } from "./timeline";
 
-export default function initGui() {
-    config.gui.gui = new GUI({ width: 500, title: "Co\u0332ntro\u0332ls" });
+function updateGuiCamera() {
+    config.gui.gui.children[1].controllers.forEach(controller => {
+        controller.updateDisplay();
+    });
+}
+
+function initGui() {
+    config.gui.gui = new GUI({ width: 500, title: "C\u0332ontrols" });
     const {
         gui: { gui },
         timeline,
         timeline: { maxYears, daysPerYear },
         cameraFocus,
+        animation,
+        geometry,
     } = config;
 
-    config.gui.guiTimeline = gui.addFolder("Time\u0332line\u0332").close();
-    config.gui.guiCamera = gui.addFolder("Ca\u0332mera\u0332 Focus");
-    const { guiTimeline, guiCamera } = config.gui;
+    config.gui.guiTimeline = gui.addFolder("T\u0332imeline").close();
+    config.gui.guiCamera = gui.addFolder("Camera F\u0332ocus").close();
+    config.gui.guiAnimation = gui.addFolder("A\u0332nimation");
+    const { guiTimeline, guiCamera, guiAnimation } = config.gui;
 
-    const deathController = guiTimeline.add(timeline, "death", 1, maxYears, 1).name("M\u0332aximum Years");
-    const stretchController = guiTimeline.add(timeline, "stretch", 1, 20, 0.1).name("S\u0332tretch Factor");
-    const flyAlongController = guiCamera.add(cameraFocus, "flyAlong").name("F\u0332ly Along");
-    const fromOutsideController = guiCamera.add(cameraFocus, "fromOutside").name("F\u0332rom Outside").show(config.cameraFocus.flyAlong);
-    const distanceController = guiCamera.add(cameraFocus, "distance", 20, 150, 1).name("Di\u0332stance").show(config.cameraFocus.flyAlong);
-    const timeController = guiCamera.add(cameraFocus, "time", 0, 1 - 1e-5, 1e-3).name("On T\u0332ime");
-    const yearController = guiCamera.add(cameraFocus, "year", 1, config.timeline.death, 1).name("On Y\u0332ear");
-    const dayController = guiCamera.add(cameraFocus, "day", 1, daysPerYear, 1).name("On D\u0332ay");
+    const deathController = guiTimeline.add(timeline, "death", 1, maxYears, 1).name("Maximum Years");
+    const stretchController = guiTimeline.add(geometry, "stretch", 1, 20, 0.1).name("Stretch Factor");
+    const flyAlongController = guiCamera.add(cameraFocus, "flyAlong").name("Fly\u0332 Along");
+    const focusSunController = guiCamera.add(cameraFocus, "focusSun").name("Focus S\u0332un").show(config.cameraFocus.flyAlong);
+    const timeController = guiCamera.add(cameraFocus, "time", 0, 1 - 1e-5, 1e-3).name("On Time");
+    const yearController = guiCamera.add(cameraFocus, "year", 1, config.timeline.death, 1).name("On Year");
+    const dayController = guiCamera.add(cameraFocus, "day", 1, daysPerYear, 1).name("On Day");
+    const runTimeController = guiAnimation.add(animation, "runTime").name("Run \u0332Time");
+    const timeIncrementController = guiAnimation.add(animation, "timeIncrement", 1, daysPerYear * 4, 1).name("Time Speed (Days/Second)");
+    const timeResetController = guiAnimation.add(animation, "resetTime").name("R\u0332eset Time");
 
     // adapt camera focus gui when changing death
     deathController
-        .onFinishChange((value) => {
-            if (yearController.getValue() > value) {
-                config.cameraFocus.time = 1 - 1e-5;
-                config.cameraFocus.year = value;
-            }
+        .onChange((value) => {
+            config.animation.runTime = false;
+            runTimeController.updateDisplay();
+            applyDeath()
+            applyTime()
             yearController.max(value);
             yearController.updateDisplay();
-
-            timeController.setValue(1 - 1e-5);
-            timeController.updateDisplay();
-            // updateConfig();
-
+            dayController.updateDisplay();
             updateTimeline();
-            updateCamera();
+            updateScene();
         });
-    stretchController.onChange(() => { updateTimeline(); updateCamera(); });
+    stretchController.onChange(() => {
+        updateTimeline();
+        updateScene();
+    });
 
     flyAlongController.onChange((value) => {
-        fromOutsideController.show(value);
-        distanceController.show(value);
+        focusSunController.show(value);
     });
-    fromOutsideController.onChange(() => updateCamera());
-    distanceController.onChange(() => updateCamera());
-    timeController
-        .onChange((value) => {
-            if (value == 1) {
-                config.cameraFocus.year = config.timeline.death;
-                config.cameraFocus.day = daysPerYear;
-            } else {
-                let days = value * config.timeline.daysTillDeath;
-                config.cameraFocus.year = clamp(days / daysPerYear + 1, 1, config.timeline.death);
-                config.cameraFocus.day = clamp(mod(days, daysPerYear) + 1, 1, daysPerYear);
-            }
-            yearController.updateDisplay();
-            dayController.updateDisplay();
-            updateCamera();
-        });
-
-    function updateTime() {
-        const time = ((config.cameraFocus.year - 1) * daysPerYear + (config.cameraFocus.day - 1)) / config.timeline.daysTillDeath;
-        config.cameraFocus.time = roundingTo(time, 5);
+    focusSunController.onChange(() => updateScene());
+    timeController.onChange(() => {
+        config.animation.runTime = false;
+        runTimeController.updateDisplay();
+        applyTime();
+        yearController.updateDisplay();
+        dayController.updateDisplay();
+        updateScene();
+    });
+    yearController.onChange(() => {
+        config.animation.runTime = false;
+        runTimeController.updateDisplay();
+        applyYearOrDay();
         timeController.updateDisplay();
-    }
-    yearController.onChange(() => { updateTime(); updateCamera(); });
-    dayController.onChange(() => { updateTime(); updateCamera(); });
+        updateScene();
+    });
+    dayController.onChange(() => {
+        config.animation.runTime = false;
+        runTimeController.updateDisplay();
+        applyYearOrDay();
+        timeController.updateDisplay();
+        updateScene();
+    });
+
+    config.animation.resetTime = () => {
+        config.cameraFocus.time = 0;
+        applyTime();
+        updateScene();
+        updateGuiCamera();
+    };
 }
+
+export { initGui, updateGuiCamera }

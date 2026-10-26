@@ -107,4 +107,4 @@ void main() {
 
 `;
 
-export default fragmentShader;
+export { fragmentShader };
