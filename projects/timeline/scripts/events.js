@@ -17,6 +17,9 @@ function initEvents() {
                     guiTimeline.open(guiTimeline._closed);
                 }
                 break;
+            case "d":
+                guiTimeline.controllers[0].setValue(!config.timeline.draw);
+                break;
 
             case "f":
                 if (gui._closed) {

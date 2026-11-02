@@ -63,6 +63,8 @@ function initConfig() {
         },
 
         timeline: {
+            draw: false,
+
             death: 30,
             maxYears: 100,
             daysPerYear: 365.25,
@@ -74,10 +76,15 @@ function initConfig() {
 
         cameraFocus: {
             flyAlong: true,
-            focusSun: true,
+            focusSun: false,
+            lastFocusSun: false,
+
+            sunDistance: 400,
+            earthDistance: 5,
+
+            phi: Math.PI * 0.4,
             theta: 0,
-            phi: Math.PI / 3,
-            distance: 500,
+            earthFocusTheta: Math.PI * 1.15,
             time: 0,
             year: 1,
             day: 1,
@@ -85,7 +92,7 @@ function initConfig() {
 
         animation: {
             runTime: true,
-            timeIncrement: 365.25 / 4, // animation in days per second
+            timeIncrement: 1, // 365.25 / 4 * 24, // animation in hours per second
             resetTime: null, // reset button function
         },
 
@@ -102,7 +109,7 @@ function initConfig() {
             pointsPerTurn: null,  // Auflösung der Kurve pro Drehung
             totalPoints: null,
             minRadius: 100,      // Mindest-Radius der gesamten Spirale
-            growRadius: 0,     // Verdickung/Verdünnung der Spirale
+            growRadius: 0,        // Verdickung/Verdünnung der Spirale
             height: null,         // Gesamthöhe der Spirale
 
             tubeRadius: 0.1,       // Die Dicke deines "Zylinders"
@@ -110,17 +117,25 @@ function initConfig() {
             radialSegments: 8,     // Auflösung des Zylinder-Querschnitts (Rundung)
         },
 
-        world: {
+        solarSystem: {
             sunPosition: new THREE.Vector3(),
             earthPosition: new THREE.Vector3(),
-            sunToEarthSizeFactor: 1 / 109, // in reality: 1 / 109,
-            scaling: 75,
+
+            scaling: 75, //6371, // earth radius in km
+
+            sunToEarthSizeFactor: 1 / 109,
+            sunTiltToEarthOrbit: 7.25, // in degrees
+            earthTiltToEarthOrbit: 23.5, // in degrees
+
+            earthOrbit: {
+                semimajor: 149597870.7, // in km
+                semiminor: 149576983.57644707, // in km via x = semimajor * sqrt(1-eccentricity^2)
+                eccentricity: 0.01671,
+            },
         },
 
         uniforms: {
             resolution: { type: "vec2", value: new THREE.Vector2(window.innerWidth, window.innerHeight), },
-
-            cameraDirection: { type: "vec3", value: new THREE.Vector3(0, 0, 1), },
 
             // type "c" for color
             // https://stackoverflow.com/questions/32660646/three-js-define-uniforms-for-fragment-shader
@@ -140,7 +155,7 @@ function initConfig() {
     config.timeline.daysSinceBDay = (Date.now() - config.timeline.birthday.getTime()) / millisecondsInDay; // current days of life since the birthday
     config.timeline.daysTillDeath = config.timeline.death * config.timeline.daysPerYear;
 
-    // config.cameraFocus.time = roundingTo(config.timeline.daysSinceBDay / config.timeline.daysTillDeath, 5);
+    config.cameraFocus.time = roundingTo(config.timeline.daysSinceBDay / config.timeline.daysTillDeath, 5);
     // config.cameraFocus.year = Math.floor(config.timeline.daysSinceBDay / config.timeline.daysPerYear);
     // config.cameraFocus.day = Math.floor(mod(config.timeline.daysSinceBDay, config.timeline.daysPerYear));
 

@@ -48,6 +48,11 @@ function drawTimeline() {
 
         config.geometry.points.push(new THREE.Vector3(x, y, z));
     }
+
+    if (!config.timeline.draw) {
+        return;
+    }
+
     const spiralCurve = new THREE.CatmullRomCurve3(config.geometry.points);
     const geometry = new THREE.TubeGeometry(spiralCurve, tubularSegments, tubeRadius, radialSegments, false);
 

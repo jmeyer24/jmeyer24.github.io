@@ -64,7 +64,7 @@ const sunFragmentShader = `
         vec3 i_pos = floor(_pos);
         vec3 f_pos = fract(_pos);
 
-        float fast_time = time * 300.0;
+        float fast_time = time * 100000.0;
         float i_time = floor(fast_time*0.2);
         float i_time_plus = i_time + 1.0;
         float f_time = fract(fast_time*0.2);
@@ -180,4 +180,149 @@ const sunFragmentShader = `
 
 `
 
-export { helperFragmentShader, sunFragmentShader };
+const earthFragmentShader = `
+
+    // https://sangillee.com/2024-06-07-create-realistic-earth-with-shaders/
+
+    uniform sampler2D u_dayTexture;
+    uniform sampler2D u_nightTexture;
+    uniform sampler2D u_normalTexture;
+    uniform sampler2D u_specTexture;
+    uniform sampler2D u_cloudTexture;
+    uniform vec3 u_sunRelPosition; // the relative position of light source
+    uniform float u_normalPower;
+    uniform vec3 u_position;
+    uniform vec3 u_moonPosition;
+    uniform float u_moonRadius;
+    uniform float u_sunRadius;
+
+    varying mat3 vTbn;
+    varying vec2 vUv; // texture UV map
+    varying vec3 vNormalWorld; // normal vector at surface
+    varying vec3 vPositionWorld;
+
+    #define PI (3.141592)
+
+    float eclipse(float angleBtw, float angleLight, float angleObs) {
+        float angleRatio2 = pow(angleObs / angleLight, 2.);
+        float value;
+        if (angleBtw > angleLight - angleObs && angleBtw < angleLight + angleObs) {
+            if (angleBtw < angleObs - angleLight) {
+                value = 0.;
+            }else {
+                float x = 0.5/angleBtw * (angleBtw*angleBtw + angleLight*angleLight - angleObs*angleObs);
+                float ths = acos(x/angleLight);
+                float thm = acos((angleBtw-x)/angleObs);
+                value = 1./PI * (PI - ths + 0.5 * sin(2. * ths) - thm * angleRatio2 + 0.5 * angleRatio2 * sin(2. * thm));
+            }
+        } else if (angleBtw > angleLight + angleObs)
+            value = 1.;
+        else { // angleBtw < angleLight - angleObs
+            value = 1. - angleRatio2;
+        }
+
+        return clamp(value, 0., 1.);
+    }
+
+    void main( void ) {
+        vec3 sunDir = normalize(u_sunRelPosition);
+
+        // Day and night texture with eclipse
+        vec3 dayColor = texture2D( u_dayTexture, vUv ).rgb;
+        vec3 nightColor = texture2D( u_nightTexture, vUv ).rgb;
+
+        float cosAngleSunToNormal = dot(vNormalWorld, sunDir); // Compute cosine sun to normal
+        float mixAmountTexture = 1. / (1. + exp(-20. * cosAngleSunToNormal));
+        float mixAmountHemisphere = mixAmountTexture;
+        
+        // 2. Eclipse
+        vec3 surfacePosition = u_position + vPositionWorld;
+        float distSurfaceToSun = length(u_sunRelPosition);
+        float cosAngleBtwSunMoon = dot(sunDir, normalize(u_moonPosition - surfacePosition));
+        float angleBtwSunMoon = acos(cosAngleBtwSunMoon);
+        float distSurfaceToMoon = length(u_moonPosition - surfacePosition);
+
+        mixAmountHemisphere *= eclipse(angleBtwSunMoon, asin(u_sunRadius/distSurfaceToSun), asin(u_moonRadius/distSurfaceToMoon));
+
+        // Normal map texture
+        vec3 t_normal = texture2D( u_normalTexture, vUv ).xyz * 2.0 - 1.0;
+        vec3 normal = normalize(vTbn * t_normal);
+        float cosAngleSunToSurface = dot(normal, sunDir); // Compute cosine sun to normal
+        mixAmountTexture *= 1.0 + u_normalPower * (cosAngleSunToSurface - cosAngleSunToNormal);
+        mixAmountTexture *= mixAmountHemisphere;
+        mixAmountTexture = clamp(mixAmountTexture, 0., 1.);
+
+        // Cloud shadow
+        vec3 translVec = 0.005 * inverse(vTbn) * (vNormalWorld - sunDir);
+        vec4 cloudsShadow = texture2D(u_cloudTexture, vUv - translVec.xy);
+        mixAmountTexture *= (1. - 0.5*cloudsShadow.r);
+
+        // Combine night and day colors
+        vec3 color = mix( nightColor, dayColor, mixAmountTexture ); // Select day or night texture
+
+        // Specular map texture with reflection
+        float reflectRatio = texture2D(u_specTexture, vUv).r;
+        reflectRatio = 0.3 * reflectRatio + 0.1;
+        vec3 reflectVec = reflect(-sunDir, normal); // reflected vector of sunlight
+        float specPower = clamp(dot(reflectVec, normalize(cameraPosition - surfacePosition)), 0., 1.); // dot product between reflected light and camera vector
+        color += mixAmountTexture * pow(specPower, 2.0) * reflectRatio;
+
+        // cloud
+        vec4 cloudsColor = texture2D(u_cloudTexture, vUv);
+        cloudsColor.r *= clamp(mixAmountHemisphere, 0.6, 1.);
+        cloudsColor.g *= clamp(pow(mixAmountHemisphere, 1.5), 0.6, 1.);
+        cloudsColor.b *= clamp(pow(mixAmountHemisphere, 2.0), 0.6, 1.); // Blue light is less scattered than red light
+        cloudsColor.a =  cloudsColor.r * clamp(mixAmountHemisphere, 0.3, 1.); // .r, as the texture doesnt have an alpha channel
+        color = color * (1.0 - cloudsColor.a) + cloudsColor.rgb * cloudsColor.a;
+
+        // render
+        gl_FragColor = vec4(color, 1.);
+    }
+
+`
+
+const earthAtmosphereShader = `
+
+    uniform vec3 u_sunRelPosition;
+    uniform vec3 u_color;
+
+    varying vec3 vPositionView;
+
+    varying vec3 vNormalWorld;
+    varying vec3 vNormalView;
+
+    void main() {
+        float cosAngleSunToNormal = dot(vNormalWorld, normalize(u_sunRelPosition));
+        float mixAmount = 1. / (1. + exp(-7. * (cosAngleSunToNormal + 0.1)));
+        
+        float cosAngle = dot(vNormalView, normalize(vPositionView));
+        float intensity = pow(3. * cosAngle, 3.);
+        
+        gl_FragColor = vec4(u_color, intensity) * mixAmount;
+    }
+
+`
+
+const earthFresnelShader = `
+
+    uniform vec3 u_sunRelPosition;
+    uniform vec3 u_color;
+
+    varying vec3 vPositionView;
+    
+    varying vec3 vNormalWorld;
+    varying vec3 vNormalView;
+
+    void main() {
+        float cosAngleSunToNormal = dot(vNormalWorld, normalize(u_sunRelPosition));
+        float mixAmount = 1. / (1. + exp(-7. * (cosAngleSunToNormal + 0.1)));
+
+        float cosAngle = dot(vNormalView, normalize(vPositionView));
+        float fresnelTerm = pow(1.0 + cosAngle, 2.0);
+        
+        gl_FragColor = vec4(u_color, 1.) * fresnelTerm * mixAmount;
+    }
+
+`
+
+export { helperFragmentShader, sunFragmentShader, earthFragmentShader, earthAtmosphereShader, earthFresnelShader };
