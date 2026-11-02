@@ -27,13 +27,9 @@ function initEvents() {
                 }
                 break;
             case "y":
-                gui.open();
-                guiCamera.open();
                 guiCamera.controllers[0].setValue(!config.cameraFocus.flyAlong);
                 break;
             case "s":
-                gui.open();
-                guiCamera.open();
                 guiCamera.controllers[1].setValue(!config.cameraFocus.focusSun);
                 break;
 
@@ -46,13 +42,9 @@ function initEvents() {
                 }
                 break;
             case " ":
-                gui.open();
-                guiAnimation.open();
                 guiAnimation.controllers[0].setValue(!config.animation.runTime);
                 break;
             case "r":
-                gui.open();
-                guiAnimation.open();
                 const controller = guiAnimation.controllers[2];
                 controller.object[controller.property]();
                 break;

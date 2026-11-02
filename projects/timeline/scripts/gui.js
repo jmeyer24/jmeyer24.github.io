@@ -11,7 +11,7 @@ function updateGuiCamera() {
 }
 
 function initGui() {
-    config.gui.gui = new GUI({ width: 500, title: "C\u0332ontrols" });
+    config.gui.gui = new GUI({ width: 500, title: "C\u0332ontrols" }).close();
     const {
         gui: { gui },
         timeline,
@@ -21,8 +21,8 @@ function initGui() {
         geometry,
     } = config;
 
-    config.gui.guiTimeline = gui.addFolder("T\u0332imeline").close();
-    config.gui.guiCamera = gui.addFolder("Camera F\u0332ocus").close();
+    config.gui.guiTimeline = gui.addFolder("T\u0332imeline");
+    config.gui.guiCamera = gui.addFolder("Camera F\u0332ocus");
     config.gui.guiAnimation = gui.addFolder("A\u0332nimation");
     const { guiTimeline, guiCamera, guiAnimation } = config.gui;
 

@@ -35,11 +35,11 @@ function applyYearOrDay() {
     config.cameraFocus.time = roundingTo(time, 5);
 }
 
-
 function updateUniformsConfig() {
+    config.uniforms.resolution.value = new THREE.Vector2(window.innerWidth, window.innerHeight);
     config.uniforms.timelineDeath.value = config.timeline.death;
-    config.uniforms.timelineStretch.value = config.geometry.stretch;
-    config.uniforms.cameraFocusTime.value = config.cameraFocus.time;
+    config.uniforms.geometryStretch.value = config.geometry.stretch;
+    config.uniforms.time.value = config.cameraFocus.time;
     config.uniforms.cameraFocusYear.value = config.cameraFocus.year;
     config.uniforms.cameraFocusDay.value = config.cameraFocus.day;
 }
@@ -75,17 +75,17 @@ function initConfig() {
         cameraFocus: {
             flyAlong: true,
             focusSun: true,
-            distance: 100,
             theta: 0,
-            phi: -50,
-            time: null,
-            year: null,
-            day: null,
+            phi: Math.PI / 3,
+            distance: 500,
+            time: 0,
+            year: 1,
+            day: 1,
         },
 
         animation: {
-            runTime: false,
-            timeIncrement: 100, // animation in days per second
+            runTime: true,
+            timeIncrement: 365.25 / 4, // animation in days per second
             resetTime: null, // reset button function
         },
 
@@ -101,7 +101,7 @@ function initConfig() {
             turns: null,          // Wie oft sich die Spirale dreht
             pointsPerTurn: null,  // Auflösung der Kurve pro Drehung
             totalPoints: null,
-            minRadius: 30,      // Mindest-Radius der gesamten Spirale
+            minRadius: 100,      // Mindest-Radius der gesamten Spirale
             growRadius: 0,     // Verdickung/Verdünnung der Spirale
             height: null,         // Gesamthöhe der Spirale
 
@@ -113,38 +113,36 @@ function initConfig() {
         world: {
             sunPosition: new THREE.Vector3(),
             earthPosition: new THREE.Vector3(),
-            sunToEarthSizeFactor: 1 / 10, // in reality: 1 / 109,
-            scaling: 5,
+            sunToEarthSizeFactor: 1 / 109, // in reality: 1 / 109,
+            scaling: 75,
         },
 
         uniforms: {
-            res: {
-                type: "vec2",
-                value: new THREE.Vector2(window.innerWidth, window.innerHeight),
-            },
+            resolution: { type: "vec2", value: new THREE.Vector2(window.innerWidth, window.innerHeight), },
 
-            // cameraPosition: { type: "vec3", value: new THREE.Vector3(0, 0, 0), },
-            cameraRotation: { type: "vec3", value: new THREE.Vector3(0, 0, 1), },
+            cameraDirection: { type: "vec3", value: new THREE.Vector3(0, 0, 1), },
 
             // type "c" for color
             // https://stackoverflow.com/questions/32660646/three-js-define-uniforms-for-fragment-shader
-            color: { type: "c", value: "#CC3333" },
-            haloColor: { type: "c", value: "#CC3333" },
+            color: { type: "c", value: new THREE.Color().setHex(0xFF7F00, THREE.LinearSRGBColorSpace) },
+            haloColor: { type: "c", value: new THREE.Color().setHex(0xCC3333, THREE.LinearSRGBColorSpace) },
 
             timelineDeath: { type: "float", value: null },
-            timelineStretch: { type: "float", value: null },
-            cameraFocusTime: { type: "float", value: null },
+            geometryStretch: { type: "float", value: null },
+            time: { type: "float", value: null },
             cameraFocusYear: { type: "float", value: null },
             cameraFocusDay: { type: "float", value: null },
+
+            TWOPI: { type: "float", value: Math.PI * 2 },
         }
     }
 
     config.timeline.daysSinceBDay = (Date.now() - config.timeline.birthday.getTime()) / millisecondsInDay; // current days of life since the birthday
     config.timeline.daysTillDeath = config.timeline.death * config.timeline.daysPerYear;
 
-    config.cameraFocus.time = roundingTo(config.timeline.daysSinceBDay / config.timeline.daysTillDeath, 5);
-    config.cameraFocus.year = Math.floor(config.timeline.daysSinceBDay / config.timeline.daysPerYear);
-    config.cameraFocus.day = Math.floor(mod(config.timeline.daysSinceBDay, config.timeline.daysPerYear));
+    // config.cameraFocus.time = roundingTo(config.timeline.daysSinceBDay / config.timeline.daysTillDeath, 5);
+    // config.cameraFocus.year = Math.floor(config.timeline.daysSinceBDay / config.timeline.daysPerYear);
+    // config.cameraFocus.day = Math.floor(mod(config.timeline.daysSinceBDay, config.timeline.daysPerYear));
 
     config.animation.resetTime = () => { };
 
