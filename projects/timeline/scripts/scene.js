@@ -63,11 +63,11 @@ function initScene() {
         celestialGeometry,
         new THREE.ShaderMaterial({
             uniforms: {
-                u_dayTexture: { value: new THREE.TextureLoader().load('./data/earth_day.jpeg') },
-                u_nightTexture: { value: new THREE.TextureLoader().load('./data/earth_night.jpeg') },
-                u_normalTexture: { value: new THREE.TextureLoader().load('./data/earth_normal.jpeg') },
-                u_specTexture: { value: new THREE.TextureLoader().load('./data/earth_specular.jpeg') },
-                u_cloudTexture: { value: new THREE.TextureLoader().load('./data/earth_clouds.jpeg') },
+                u_dayTexture: { value: new THREE.TextureLoader().load('./data/2k_earth_daymap.jpg') },
+                u_nightTexture: { value: new THREE.TextureLoader().load('./data/2k_earth_nightmap.jpg') },
+                u_normalTexture: { value: new THREE.TextureLoader().load('./data/2k_earth_normal_map.jpg') },
+                u_specTexture: { value: new THREE.TextureLoader().load('./data/2k_earth_specular_map.jpg') },
+                u_cloudTexture: { value: new THREE.TextureLoader().load('./data/2k_earth_clouds.jpg') },
                 u_sunRelPosition: { value: new THREE.Vector3(0, 0, 0) },
                 u_position: { value: new THREE.Vector3(0, 0, 0) },
                 u_moonPosition: { value: new THREE.Vector3(0, 0, 0) },
