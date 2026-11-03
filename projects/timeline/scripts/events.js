@@ -45,10 +45,10 @@ function initEvents() {
                 }
                 break;
             case " ":
-                guiAnimation.controllers[0].setValue(!config.animation.runTime);
+                guiAnimation.controllers[3].setValue(!config.animation.runTime);
                 break;
             case "r":
-                const controller = guiAnimation.controllers[2];
+                const controller = guiAnimation.controllers[5];
                 controller.object[controller.property]();
                 break;
 

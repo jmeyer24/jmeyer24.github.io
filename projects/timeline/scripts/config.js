@@ -38,19 +38,19 @@ function applyYearOrDay() {
 function updateUniformsConfig() {
     config.uniforms.resolution.value = new THREE.Vector2(window.innerWidth, window.innerHeight);
     config.uniforms.timelineDeath.value = config.timeline.death;
-    config.uniforms.geometryStretch.value = config.geometry.stretch;
+    config.uniforms.geometryStretch.value = config.timeline.geometry.stretch;
     config.uniforms.time.value = config.cameraFocus.time;
     config.uniforms.cameraFocusYear.value = config.cameraFocus.year;
     config.uniforms.cameraFocusDay.value = config.cameraFocus.day;
 }
 
 function updateGeometryConfig() {
-    config.geometry.turns = config.timeline.death;
-    config.geometry.pointsPerTurn = Math.floor(config.timeline.daysPerYear);
-    config.geometry.totalPoints = Math.floor(0.25 * config.geometry.turns * config.geometry.pointsPerTurn);
-    config.geometry.height = config.timeline.death * config.geometry.stretch;
+    config.timeline.geometry.turns = config.timeline.death;
+    config.timeline.geometry.pointsPerTurn = Math.floor(config.timeline.daysPerYear);
+    config.timeline.geometry.totalPoints = Math.floor(0.25 * config.timeline.geometry.turns * config.timeline.geometry.pointsPerTurn);
+    config.timeline.geometry.height = config.timeline.death * config.timeline.geometry.stretch;
 
-    config.geometry.tubularSegments = config.geometry.totalPoints; // Auflösung entlang der Spirale
+    config.timeline.geometry.tubularSegments = config.timeline.geometry.totalPoints; // Auflösung entlang der Spirale
 }
 
 function initConfig() {
@@ -72,6 +72,23 @@ function initConfig() {
             birthday: new Date("April 02, 1998 10:11:12"),
             daysSinceBDay: null,
             daysTillDeath: null,
+
+            geometry: {
+                asSpiral: true,
+                stretch: 10,
+
+                points: [],
+                turns: null,          // Wie oft sich die Spirale dreht
+                pointsPerTurn: null,  // Auflösung der Kurve pro Drehung
+                totalPoints: null,
+                minRadius: 100,      // Mindest-Radius der gesamten Spirale
+                growRadius: 0,        // Verdickung/Verdünnung der Spirale
+                height: null,         // Gesamthöhe der Spirale
+
+                tubeRadius: 0.1,       // Die Dicke deines "Zylinders"
+                tubularSegments: null, // Auflösung entlang der Spirale
+                radialSegments: 8,     // Auflösung des Zylinder-Querschnitts (Rundung)
+            },
         },
 
         cameraFocus: {
@@ -98,23 +115,6 @@ function initConfig() {
 
         color: {
             background: getComputedStyle(document.documentElement).getPropertyValue("--color-background").trim(),
-        },
-
-        geometry: {
-            asSpiral: true,
-            stretch: 10,
-
-            points: [],
-            turns: null,          // Wie oft sich die Spirale dreht
-            pointsPerTurn: null,  // Auflösung der Kurve pro Drehung
-            totalPoints: null,
-            minRadius: 100,      // Mindest-Radius der gesamten Spirale
-            growRadius: 0,        // Verdickung/Verdünnung der Spirale
-            height: null,         // Gesamthöhe der Spirale
-
-            tubeRadius: 0.1,       // Die Dicke deines "Zylinders"
-            tubularSegments: null, // Auflösung entlang der Spirale
-            radialSegments: 8,     // Auflösung des Zylinder-Querschnitts (Rundung)
         },
 
         solarSystem: {

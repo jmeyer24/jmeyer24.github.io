@@ -28,6 +28,8 @@ const helperFragmentShader = `
 
 `;
 
+const timelineFragmentShader = ``;
+
 const sunFragmentShader = `
 
     // https://sangillee.com/2024-06-29-create-realistic-sun-with-shaders/
@@ -325,4 +327,4 @@ const earthFresnelShader = `
 
 `
 
-export { helperFragmentShader, sunFragmentShader, earthFragmentShader, earthAtmosphereShader, earthFresnelShader };
+export { helperFragmentShader, timelineFragmentShader, sunFragmentShader, earthFragmentShader, earthAtmosphereShader, earthFresnelShader };

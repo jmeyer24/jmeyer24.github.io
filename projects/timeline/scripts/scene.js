@@ -1,13 +1,15 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 
-import { config, applyTime } from "./config";
-import { updateGuiCamera } from "./gui";
+import { config, applyTime, updateGeometryConfig } from "./config";
+import { updateGui } from "./gui";
 import { vertexShader, earthVertexShader } from "./shader.vert.js";
-import { helperFragmentShader, sunFragmentShader, earthFragmentShader, earthAtmosphereShader, earthFresnelShader } from "./shader.frag.js";
+import { helperFragmentShader, timelineFragmentShader, sunFragmentShader, earthFragmentShader, earthAtmosphereShader, earthFresnelShader } from "./shader.frag.js";
 
 let scene, camera, renderer, controls;
-let universe, sun, earth, earthAtmosphere, earthFresnel, moon;
+let sun, earth, earthAtmosphere, earthFresnel, moon;
+
+const timeline = new THREE.Mesh();
 
 const timer = new THREE.Timer();
 const sunRelPosition = new THREE.Vector3();
@@ -17,11 +19,37 @@ const earthEquator = new THREE.Object3D();
 const moonOrbit = new THREE.Object3D();
 const moonEquator = new THREE.Object3D();
 
+function updateTimelineGeometry() {
+    // update before we read the constants in 
+    updateGeometryConfig();
+    const { totalPoints, turns, height, tubularSegments, tubeRadius, radialSegments, minRadius, growRadius } = config.timeline.geometry;
+
+    config.timeline.geometry.points = [];
+    for (let i = 0; i <= totalPoints; i++) {
+        const lifePercentage = i / totalPoints
+        const theta = lifePercentage * turns * Math.PI * 2;
+        const x = (lifePercentage * growRadius + minRadius) * Math.cos(theta);
+        const z = (lifePercentage * growRadius + minRadius) * Math.sin(theta);
+        const y = (i / totalPoints) * height; // Zentriert auf der Y-Achse
+
+        config.timeline.geometry.points.push(new THREE.Vector3(x, y, z));
+    }
+
+    timeline.geometry =
+        new THREE.TubeGeometry(
+            new THREE.CatmullRomCurve3(config.timeline.geometry.points),
+            tubularSegments,
+            tubeRadius,
+            radialSegments,
+            false
+        );
+}
+
 function initScene() {
     const {
         cameraFocus: { theta, phi, sunDistance, earthDistance, focusSun },
-        solarSystem: { sunPosition, earthPosition, moonPosition, scaling, sunToEarthSizeFactor, earthToMoonSizeFactor, earthTiltToEarthOrbit, moonTiltToEarthEquator },
-        color: { background },
+        solarSystem: { sunPosition, earthPosition, scaling, sunToEarthSizeFactor, earthToMoonSizeFactor, earthTiltToEarthOrbit, moonTiltToEarthEquator },
+        timeline: { draw },
     } = config
 
     scene = new THREE.Scene();
@@ -46,6 +74,17 @@ function initScene() {
     const celestialGeometry = new THREE.SphereGeometry(1, 128, 128);
     celestialGeometry.computeTangents(); // for the tangents in the shader
 
+    // timeline
+    updateTimelineGeometry();
+    timeline.material =
+        new THREE.ShaderMaterial({
+            uniforms: config.uniforms,
+            vertexShader: vertexShader,
+            fragmentShader: helperFragmentShader,
+            side: THREE.DoubleSide,
+        });
+
+    // celestial bodies
     sun = new THREE.Mesh(
         celestialGeometry,
         new THREE.ShaderMaterial({
@@ -131,9 +170,12 @@ function initScene() {
     document.body.appendChild(renderer.domElement);
     scene.add(camera);
 
+    scene.add(timeline);
+    timeline.visible = draw;
+
     scene.add(sun);
     sun.scale.setScalar(scaling);
-    sun.add(new THREE.PointLight(0xffffff, 50000));
+    sun.add(new THREE.PointLight(0xffffff, 25000));
 
     scene.add(earthOrbit);
     earthOrbit.add(earthEquator);
@@ -163,10 +205,11 @@ function resize() {
 
 function updateSolarSystem() {
     const {
-        timeline: { daysPerYear, death },
+        timeline: { daysPerYear, death, draw,
+            geometry: { points, totalPoints },
+        },
         cameraFocus: { time },
         solarSystem: { sunPosition, earthPosition, moonPosition },
-        geometry: { points, totalPoints },
     } = config
 
     // do interpolation of positions on timeline
@@ -259,11 +302,11 @@ function animate() {
             config.cameraFocus.time = time;
             applyTime();
             updateScene();
-            updateGuiCamera();
+            updateGui();
         }
     }
 
     renderer.render(scene, camera);
 }
 
-export { scene, initScene, updateScene, resize, animate };
+export { scene, timeline, updateTimelineGeometry, initScene, updateScene, updateCamera, resize, animate };
