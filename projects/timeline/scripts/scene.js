@@ -1,33 +1,32 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 
-import { config, applyTime, updateUniformsConfig } from "./config";
+import { config, applyTime } from "./config";
 import { updateGuiCamera } from "./gui";
 import { vertexShader, earthVertexShader } from "./shader.vert.js";
 import { helperFragmentShader, sunFragmentShader, earthFragmentShader, earthAtmosphereShader, earthFresnelShader } from "./shader.frag.js";
 
 let scene, camera, renderer, controls;
-let sun, earth, earthAtmosphere, earthFresnel;
+let universe, sun, earth, earthAtmosphere, earthFresnel, moon;
 
 const timer = new THREE.Timer();
 const sunRelPosition = new THREE.Vector3();
 
-const earth_orbit = new THREE.Object3D();
-const earth_equator = new THREE.Object3D();
-const moon_orbit = new THREE.Object3D();
-// earth_equator.rotateZ(23.5*Math.PI/180);
+const earthOrbit = new THREE.Object3D();
+const earthEquator = new THREE.Object3D();
+const moonOrbit = new THREE.Object3D();
+const moonEquator = new THREE.Object3D();
 
 function initScene() {
     const {
         cameraFocus: { theta, phi, sunDistance, earthDistance, focusSun },
-        solarSystem: { sunPosition, earthPosition, scaling, sunToEarthSizeFactor },
+        solarSystem: { sunPosition, earthPosition, moonPosition, scaling, sunToEarthSizeFactor, earthToMoonSizeFactor, earthTiltToEarthOrbit, moonTiltToEarthEquator },
         color: { background },
     } = config
 
     scene = new THREE.Scene();
-    scene.background = new THREE.Color(background);
 
-    camera = new THREE.PerspectiveCamera(27, window.innerWidth / window.innerHeight, 1, 10000);
+    camera = new THREE.PerspectiveCamera(27, window.innerWidth / window.innerHeight, 0.1, 10000);
     camera.position
         .set(
             Math.sin(phi) * Math.sin(theta),
@@ -37,7 +36,7 @@ function initScene() {
         .multiplyScalar(focusSun ? sunDistance : earthDistance)
         .add(focusSun ? sunPosition : earthPosition)
 
-    renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, precision: "highp" });
+    renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, precision: "lowp" });
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(window.innerWidth, window.innerHeight);
 
@@ -54,7 +53,7 @@ function initScene() {
             vertexShader: vertexShader,
             fragmentShader: sunFragmentShader,
             // fragmentShader: helperFragmentShader,
-            side: THREE.DoubleSide,
+            side: THREE.FrontSide,
             transparent: true,
         })
     );
@@ -71,12 +70,13 @@ function initScene() {
                 u_sunRelPosition: { value: new THREE.Vector3(0, 0, 0) },
                 u_position: { value: new THREE.Vector3(0, 0, 0) },
                 u_moonPosition: { value: new THREE.Vector3(0, 0, 0) },
-                u_normalPower: { value: 5.0 },
                 u_moonRadius: { value: 0.05 },
                 u_sunRadius: { value: 0.2 },
+                u_normalPower: { value: 10.0 },
             },
             vertexShader: earthVertexShader,
             fragmentShader: earthFragmentShader,
+            side: THREE.FrontSide,
         })
     );
 
@@ -89,8 +89,8 @@ function initScene() {
             },
             vertexShader: vertexShader,
             fragmentShader: earthAtmosphereShader,
-            transparent: true,
             side: THREE.BackSide,
+            transparent: true,
             depthTest: true,
             depthWrite: false,
         })
@@ -105,11 +105,28 @@ function initScene() {
             },
             vertexShader: vertexShader,
             fragmentShader: earthFresnelShader,
-            transparent: true
+            side: THREE.FrontSide,
+            transparent: true,
         })
     );
 
+    moon = new THREE.Mesh(
+        celestialGeometry,
+        new THREE.MeshLambertMaterial()
+    );
+    new THREE.TextureLoader().load('./data/2k_moon.jpg', (texture) => {
+        moon.material.map = texture;
+        moon.material.needsUpdate = true;
+    });
+
     ///////////////////////////////////////
+
+    new THREE.TextureLoader().load('./data/8k_stars_milky_way.jpg', (texture) => {
+        texture.mapping = THREE.EquirectangularReflectionMapping;
+        texture.colorSpace = THREE.SRGBColorSpace;
+
+        scene.background = texture;
+    });
 
     document.body.appendChild(renderer.domElement);
     scene.add(camera);
@@ -118,9 +135,11 @@ function initScene() {
     sun.scale.setScalar(scaling);
     sun.add(new THREE.PointLight(0xffffff, 50000));
 
-    scene.add(earth_orbit);
-    earth_orbit.add(earth_equator);
-    earth_equator.add(earth);
+    scene.add(earthOrbit);
+    earthOrbit.add(earthEquator);
+    earthEquator.rotateZ((earthTiltToEarthOrbit / 360) * Math.PI * 2);
+
+    earthEquator.add(earth);
     earth.scale.setScalar(scaling * sunToEarthSizeFactor);
 
     earth.add(earthAtmosphere);
@@ -128,8 +147,11 @@ function initScene() {
     earthAtmosphere.scale.set(1.05, 1.05, 1.05);
     earthFresnel.scale.set(1.0001, 1.0001, 1.0001);;
 
-    earth_equator.add(moon_orbit);
-    // moon_orbit.add(moon);
+    earthEquator.add(moonOrbit);
+    moonOrbit.add(moonEquator);
+    moonEquator.rotateZ((moonTiltToEarthEquator / 360) * Math.PI * 2);
+    moonEquator.add(moon);
+    moon.scale.setScalar(scaling * sunToEarthSizeFactor * earthToMoonSizeFactor);
 }
 
 function resize() {
@@ -139,10 +161,11 @@ function resize() {
     renderer.setSize(window.innerWidth, window.innerHeight);
 }
 
-function updateSunEarth() {
+function updateSolarSystem() {
     const {
-        cameraFocus: { time, day },
-        solarSystem: { sunPosition, earthPosition },
+        timeline: { daysPerYear, death },
+        cameraFocus: { time },
+        solarSystem: { sunPosition, earthPosition, moonPosition },
         geometry: { points, totalPoints },
     } = config
 
@@ -153,22 +176,30 @@ function updateSunEarth() {
     earthPosition.lerpVectors(points[a], points[b], alpha);
     sunPosition.set(0, earthPosition.getComponent(1), 0);
 
-    // update objects position
-    const t = day * Math.PI * 2;
-    const t_moon = day * Math.PI * 2 / 27.3; // average 27.3 days / rotation
-    sun.position.copy(sunPosition);
-    sun.rotation.set(0, t / 27, 0); // average 27 days / rotation
-    earth.position.copy(earthPosition);
-    earth.rotation.set(0, t, 0);
+    // update celestial bodies
+    const t_earth = time * death * daysPerYear * Math.PI * 2;
+    const t_moon = t_earth / 27.3; // average 27.3 days / rotation
+    const t_sun = t_earth / 27; // average 27 days / rotation
 
-    // update rest of the system
+    sun.position.copy(sunPosition);
+    sun.rotation.set(0, t_sun, 0);
+
+    earthOrbit.position.copy(earthPosition);
+    earth.rotation.set(0, t_earth, 0);
+
+    moonPosition.set(-1.0 * Math.cos(t_moon), 0, Math.sin(t_moon));
+    moonOrbit.position.copy(moonPosition);
+    // moonOrbit.rotation.set(0, t_moon, 0);
+    // moonEquator.rotation.set(0, -t_moon, 0);
+    moon.rotation.set(0, t_moon, 0);
+    // moonEquator.position.set(0, 0, 1);
+
+    // update shader uniforms
     sunRelPosition.subVectors(sunPosition, earthPosition);
     earth.material.uniforms.u_sunRelPosition.value = sunRelPosition;
+    earth.material.uniforms.u_moonPosition.value = moonPosition;
     earthAtmosphere.material.uniforms.u_sunRelPosition.value = sunRelPosition;
     earthFresnel.material.uniforms.u_sunRelPosition.value = sunRelPosition;
-    // const p = new THREE.Vector3(0.4 * Math.cos(t_moon), 0, -0.4 * Math.sin(t_moon));
-    // moon.position.set(p);
-    // earthMaterial.uniforms.u_moonPosition.value = p
 }
 
 function updateCamera() {
@@ -213,7 +244,7 @@ function updateCamera() {
 }
 
 function updateScene() {
-    updateSunEarth();
+    updateSolarSystem();
     updateCamera();
 }
 

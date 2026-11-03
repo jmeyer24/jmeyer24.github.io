@@ -36,7 +36,7 @@ function initGui() {
     const yearController = guiCamera.add(cameraFocus, "year", 1, config.timeline.death, 1).name("On Year");
     const dayController = guiCamera.add(cameraFocus, "day", 1, daysPerYear, 1).name("On Day");
     const runTimeController = guiAnimation.add(animation, "runTime").name("Run \u0332Time");
-    const timeIncrementController = guiAnimation.add(animation, "timeIncrement", 1, daysPerYear / 12 * 24, 1).name("Time Speed (Hours/Second)");
+    const timeIncrementController = guiAnimation.add(animation, "timeIncrement", 1, 24, 1).name("Time Speed (Hours/Second)");
     const timeResetController = guiAnimation.add(animation, "resetTime").name("R\u0332eset Time");
 
     // adapt camera focus gui when changing death

@@ -120,12 +120,15 @@ function initConfig() {
         solarSystem: {
             sunPosition: new THREE.Vector3(),
             earthPosition: new THREE.Vector3(),
+            moonPosition: new THREE.Vector3(),
 
             scaling: 75, //6371, // earth radius in km
 
             sunToEarthSizeFactor: 1 / 109,
+            earthToMoonSizeFactor: 1 / 3.7,
             sunTiltToEarthOrbit: 7.25, // in degrees
-            earthTiltToEarthOrbit: 23.5, // in degrees
+            earthTiltToEarthOrbit: 23.44, // in degrees
+            moonTiltToEarthEquator: 5.14, // in degrees
 
             earthOrbit: {
                 semimajor: 149597870.7, // in km
@@ -165,4 +168,4 @@ function initConfig() {
     updateGeometryConfig();
 }
 
-export { config, initConfig, updateUniformsConfig, updateGeometryConfig, applyDeath, applyTime, applyYearOrDay };
+export { config, initConfig, updateGeometryConfig, applyDeath, applyTime, applyYearOrDay };
