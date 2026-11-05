@@ -5,7 +5,7 @@ export const vectorFieldFrag = `
     precision highp sampler3D;
     precision highp sampler2D;
 
-    uniform sampler2D u_vecFieldTex;
+    uniform sampler2D u_vectorFieldTexture;
     uniform sampler2D u_noiseTexture;
     uniform int u_steps;
     uniform vec3 u_color;
@@ -20,7 +20,7 @@ export const vectorFieldFrag = `
 
     void main(){
         // streamline  
-        float stepSize = 1.0 / max2(vec2(textureSize(u_vecFieldTex, 0)));
+        float stepSize = 1.0 / max2(vec2(textureSize(u_vectorFieldTexture, 0)));
         float accumulated_brightness = texture(u_noiseTexture, vUv).r;
         vec2 ray = vec2(0.);
         
@@ -28,7 +28,7 @@ export const vectorFieldFrag = `
         vec2 uv = vUv;
         for(int i = 1; i <= u_steps; i++){
             // get the vector direction at the current position
-            ray = normalize(texture(u_vecFieldTex, uv).rg);
+            ray = normalize(texture(u_vectorFieldTexture, uv).rg);
 
             // move along streamline
             uv += ray * stepSize;
@@ -40,7 +40,7 @@ export const vectorFieldFrag = `
         // accumulate in backward direction
         uv = vUv;
         for(int i = 1; i <= u_steps; i++){
-            ray = normalize(texture(u_vecFieldTex, uv).rg);
+            ray = normalize(texture(u_vectorFieldTexture, uv).rg);
             uv -= ray * stepSize;
             accumulated_brightness += texture(u_noiseTexture, uv).r;
         }

@@ -9,3 +9,11 @@
 body {
   @apply m-auto text-(--color-text) bg-(--color-bg);
 }
+
+h1 {
+  @apply text-4xl font-bold text-inherit underline underline-offset-8;
+}
+
+p {
+  @apply text-justify;
+}
