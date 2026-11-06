@@ -1,4 +1,4 @@
-import projects from "@/projects.js";
+import projects from "@/projects.json";
 
 // load the navigation bar and the footer bar
 $("footer").load("/structure/footer.html")
@@ -15,47 +15,45 @@ function writeContent() {
         window.location.hash = "welcome";
     }
     // get the page name/path
-    let current_page = window.location.hash.split("#").filter(Boolean);
-    let nav_current_page = "";
-    if (current_page.includes("project")) {
+    let currentPage = window.location.hash.split("#").filter(Boolean);
+    let navCurrentPage = "";
+    if (currentPage.includes("project")) {
         const project = window.location.hash.split("#").slice(-1)[0];
-        nav_current_page = projects[project];
-        current_page = "project";
+        navCurrentPage = projects[project];
+        currentPage = "project";
     } else {
-        nav_current_page = current_page.slice(-1)[0];
-        current_page = current_page.join("/");
+        navCurrentPage = currentPage.slice(-1)[0];
+        currentPage = currentPage.join("/");
     }
 
     // update the navigation title
-    $("nav #current-site").html(nav_current_page);
+    $("nav #current-site").html(navCurrentPage);
 
     // write the content in the main element
     const baseUrl = import.meta.env.BASE_URL;
-    const url = `${baseUrl}pages/${current_page}.html`;
+    const url = `${baseUrl}pages/${currentPage}.html`;
     $("body").removeClass("show-footer");
     $("main").load(url, function (response, status, xhr) {
         // add the footer to the welcome page
-        switch (current_page) {
+        switch (currentPage) {
             case "welcome":
                 $("body").addClass("show-footer");
                 break;
             case "projects":
                 // fill the projects page with imaged links
-                // const imgDefault = new URL(`${baseUrl}images/ball_800x800.png`, import.meta.url).href;
                 const imgDefault = `${baseUrl}images/ball_800x800.png`;
-                Object.entries(projects).forEach(([key, value]) => {
-                    // const imgUrl = new URL(`${baseUrl}images/${key}.jpg`, import.meta.url).href;
-                    const imgUrl = `${baseUrl}images/${key}.jpg`;
+                projects.forEach(project => {
+                    const imgUrl = `${baseUrl}images/${project.folder}.${project.img_ext}`;
                     $("#project-list").append(`
                         <div class="w-full max-w-xs mx-auto">
-                            <a href="${baseUrl}#project#${key}" class="relative">
+                            <a href="${baseUrl}#project#${project.folder}" class="relative">
                                 <img 
                                     src="${imgUrl}" 
                                     onerror="this.onerror=null; this.src='${imgDefault}';" 
                                     class="rounded-image object-cover object-top-left" 
                                 />
                                 <div class="absolute size-full top-1/2 left-1/2 -translate-1/2 rounded-(--border-radius) flex items-center justify-center text-center text-shadow-[-1px_1px_2px_var(--color-high),1px_1px_1px_var(--color-bg)] bg-(--color-high) opacity-0 duration-(--transition-time) ease-in-out hover:opacity-90">
-                                    ${value}
+                                    ${project.name}
                                 </div>
                             </a>
                         </div>
@@ -83,7 +81,7 @@ function writeContent() {
                             });
                     })
                     .catch(error => {
-                        console.warn(`"${current_page}.html" could not be loaded properly. ${error.message}`);
+                        console.warn(`"${currentPage}.html" could not be loaded properly. ${error.message}`);
                         $("main").load(`${baseUrl}structure/404.html`);
                     });
                 break;
@@ -92,7 +90,7 @@ function writeContent() {
         }
 
         if (status == "error") {
-            console.warn(`"${current_page}.html" could not be loaded properly. HTTP-status: ${xhr.status}`);
+            console.warn(`"${currentPage}.html" could not be loaded properly. HTTP-status: ${xhr.status}`);
             $("main").load("/structure/404.html");
         }
     });

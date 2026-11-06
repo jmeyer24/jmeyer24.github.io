@@ -1,0 +1,27 @@
+[
+    {
+        "folder": "tonnetz",
+        "name": "Euler's Tonnetz",
+        "img_ext": "jpg"
+    },
+    {
+        "folder": "SAFE",
+        "name": "Fractal Explorer",
+        "img_ext": "jpg"
+    },
+    {
+        "folder": "malazanKnowledgeGraph",
+        "name": "Malazan Graph",
+        "img_ext": "jpg"
+    },
+    {
+        "folder": "timeline",
+        "name": "Timeline",
+        "img_ext": "png"
+    },
+    {
+        "folder": "LIC",
+        "name": "Line Integral Convolution",
+        "img_ext": "png"
+    }
+]

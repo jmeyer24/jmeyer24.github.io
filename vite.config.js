@@ -10,7 +10,7 @@ const htmlFiles = globSync('**/index.html', {
 const rollupInput = {};
 htmlFiles.forEach((file) => {
   const key = file.replace(/\.html$/, '');
-  rollupInput[key] = resolve(__dirname, file);
+  rollupInput[key] = path.resolve(__dirname, file);
 });
 
 export default defineConfig({
