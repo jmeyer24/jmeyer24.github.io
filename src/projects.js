@@ -3,6 +3,7 @@ const projects = {
     SAFE: "Fractal Explorer",
     malazanKnowledgeGraph: "Malazan Graph",
     timeline: "Timeline",
+    LIC: "Line Integral Convolution",
 };
 
 export default projects;
