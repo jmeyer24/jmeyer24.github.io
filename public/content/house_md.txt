@@ -1,17 +1,31 @@
-Primary Amoebic Meningoencephalitis
-Herpes Encephalitis
-Tuberous Sclerosis Complex
-Erdheim-Chester Disease
-Cardiac Arrest
+Still's disease
+Necrotising fasciitis
+Chronic granulomatous disease
+Osteomyelitis
+Disseminated intravascular coagulation
+Hepatitis A
+MERRF syndrome
+Adrenomyeloneuropathy
+Sarcoidosis
+Amyloidosis
+Transesophageal echocardiography
+Intracranial pressure
+Addison's disease
+Cardiogenic shock
+Primary amoebic meningoencephalitis
+Herpes encephalitis
+Tuberous sclerosis complex
+Erdheim-Chester disease
+Cardiac arrest
 Botulism
 Plasmapheresis
 Electromyography
-Polymerase Chain Reaction
-Positron Emission Tomography
-Magnetic Resonance Angiography
-Magnetic Resonance Tomography
-Lumbar Puncture
-CT Scan
+Polymerase chain reaction
+Positron emission tomography
+Magnetic resonance angiography
+Magnetic resonance tomography
+Lumbar puncture
+CT scan
 Hypokalemia
 Tachycardia
 Echocardiography

@@ -1,11 +1,13 @@
-import { defineConfig } from 'vite'
-import tailwindcss from '@tailwindcss/vite'
+import { defineConfig } from 'vite';
+import tailwindcss from '@tailwindcss/vite';
+import path from 'path';
 
 export default defineConfig({
   base: "/",
   plugins: [
     tailwindcss(),
   ],
+  // Access points for main and projects
   build: {
     rollupOptions: {
       input: {
@@ -15,5 +17,13 @@ export default defineConfig({
         timeline: './projects/timeline/index.html',
       }
     }
-  }
+  },
+  // Creates an Alias
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, './src'),
+    }
+  },
+  // No SPA-Fallback für unresolved paths (-> 404 error like on github pages)
+  appType: 'mpa',
 })
