@@ -19,6 +19,9 @@ const earthEquator = new THREE.Object3D();
 const moonOrbit = new THREE.Object3D();
 const moonEquator = new THREE.Object3D();
 
+const baseUrl = import.meta.env.BASE_URL;
+const url = (filename) => `${baseUrl}projects/timeline/data/${filename}.jpg`;
+
 function updateTimelineGeometry() {
     // update before we read the constants in 
     updateGeometryConfig();
@@ -101,11 +104,11 @@ function initScene() {
         celestialGeometry,
         new THREE.ShaderMaterial({
             uniforms: {
-                u_dayTexture: { value: new THREE.TextureLoader().load('./data/2k_earth_daymap.jpg') },
-                u_nightTexture: { value: new THREE.TextureLoader().load('./data/2k_earth_nightmap.jpg') },
-                u_normalTexture: { value: new THREE.TextureLoader().load('./data/2k_earth_normal_map.jpg') },
-                u_specTexture: { value: new THREE.TextureLoader().load('./data/2k_earth_specular_map.jpg') },
-                u_cloudTexture: { value: new THREE.TextureLoader().load('./data/2k_earth_clouds.jpg') },
+                u_dayTexture: { value: new THREE.TextureLoader().load(url("2k_earth_daymap")) },
+                u_nightTexture: { value: new THREE.TextureLoader().load(url("2k_earth_nightmap")) },
+                u_normalTexture: { value: new THREE.TextureLoader().load(url("2k_earth_normal_map")) },
+                u_specTexture: { value: new THREE.TextureLoader().load(url("2k_earth_specular_map")) },
+                u_cloudTexture: { value: new THREE.TextureLoader().load(url("2k_earth_clouds")) },
                 u_sunRelPosition: { value: new THREE.Vector3(0, 0, 0) },
                 u_position: { value: new THREE.Vector3(0, 0, 0) },
                 u_moonPosition: { value: new THREE.Vector3(0, 0, 0) },
@@ -153,14 +156,14 @@ function initScene() {
         celestialGeometry,
         new THREE.MeshLambertMaterial()
     );
-    new THREE.TextureLoader().load('./data/2k_moon.jpg', (texture) => {
+    new THREE.TextureLoader().load(url("2k_moon"), (texture) => {
         moon.material.map = texture;
         moon.material.needsUpdate = true;
     });
 
     ///////////////////////////////////////
 
-    new THREE.TextureLoader().load('./data/8k_stars_milky_way.jpg', (texture) => {
+    new THREE.TextureLoader().load(url("8k_stars_milky_way"), (texture) => {
         texture.mapping = THREE.EquirectangularReflectionMapping;
         texture.colorSpace = THREE.SRGBColorSpace;
 
