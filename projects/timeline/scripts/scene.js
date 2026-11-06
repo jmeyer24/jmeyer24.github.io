@@ -19,10 +19,7 @@ const earthEquator = new THREE.Object3D();
 const moonOrbit = new THREE.Object3D();
 const moonEquator = new THREE.Object3D();
 
-const baseUrl = import.meta.env.BASE_URL;
-// const url = (filename) => `${baseUrl}projects/timeline/data/${filename}.jpg`;
 const url = (filename) => new URL(`../data/${filename}.jpg`, import.meta.url).href;
-
 
 function updateTimelineGeometry() {
     // update before we read the constants in 
