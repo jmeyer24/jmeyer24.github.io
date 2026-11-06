@@ -1,6 +1,17 @@
 import { defineConfig } from 'vite';
 import tailwindcss from '@tailwindcss/vite';
 import path from 'path';
+import { globSync } from 'glob';
+
+// find all .html files of projects (and the root one)
+const htmlFiles = globSync('**/index.html', {
+  ignore: ['dist/**', 'node_modules/**']
+});
+const rollupInput = {};
+htmlFiles.forEach((file) => {
+  const key = file.replace(/\.html$/, '');
+  rollupInput[key] = resolve(__dirname, file);
+});
 
 export default defineConfig({
   base: "/",
@@ -10,12 +21,7 @@ export default defineConfig({
   // Access points for main and projects
   build: {
     rollupOptions: {
-      input: {
-        main: './index.html',
-        tonnetz: './projects/tonnetz/index.html',
-        SAFE: './projects/SAFE/index.html',
-        timeline: './projects/timeline/index.html',
-      }
+      input: rollupInput
     }
   },
   // Creates an Alias
